@@ -21,7 +21,7 @@ export const WorkspaceSettings = () => {
   };
 
   return (
-    <div style={{ maxWidth: '760px', margin: '32px auto', padding: '0 24px' }}>
+    <div className="page-container workspace-page" style={{ maxWidth: '760px', margin: '32px auto', padding: '0 24px' }}>
       <div style={{ marginBottom: '32px' }}>
         <h2 style={{ fontSize: '1.75rem', fontWeight: 800, background: 'var(--brand-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
           Workspace Settings

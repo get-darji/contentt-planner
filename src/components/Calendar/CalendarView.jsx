@@ -109,7 +109,7 @@ export const CalendarView = () => {
   };
 
   return (
-    <div style={{ maxWidth: '1400px', margin: '24px auto', padding: '0 24px' }}>
+    <div className="page-container calendar-page" style={{ maxWidth: '1400px', margin: '24px auto', padding: '0 24px' }}>
       
       {pastDateWarning && (
         <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', color: '#dc2626', padding: '10px 14px', borderRadius: '10px', fontSize: '0.85rem', fontWeight: 700, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -118,9 +118,9 @@ export const CalendarView = () => {
       )}
 
       {/* Top Filter & Toolbar Bar */}
-      <div className="ui-card" style={{ padding: '16px 24px', marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+      <div className="ui-card calendar-toolbar" style={{ padding: '16px 24px', marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
         
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div className="calendar-controls" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <button className="btn btn-secondary btn-icon" onClick={handlePrevMonth} title="Previous Month">
             <ChevronLeft size={18} />
           </button>
@@ -157,7 +157,7 @@ export const CalendarView = () => {
         </div>
 
         {/* Platform & Status Filters */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+        <div className="filter-controls" style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--bg-main)', padding: '4px', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
             <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', padding: '0 8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -230,7 +230,7 @@ export const CalendarView = () => {
       </div>
 
       {/* Calendar Grid Headers */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '12px', marginBottom: '8px', textAlign: 'center' }}>
+      <div className="calendar-weekdays" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '12px', marginBottom: '8px', textAlign: 'center' }}>
         {daysOfWeek.map(day => (
           <div key={day} style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             {day}
@@ -239,7 +239,7 @@ export const CalendarView = () => {
       </div>
 
       {/* Calendar Big Tiles Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '12px' }}>
+      <div className="calendar-month-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '12px' }}>
         {calendarGrid.map((cell, idx) => {
           if (!cell.isCurrentMonth) {
             return (

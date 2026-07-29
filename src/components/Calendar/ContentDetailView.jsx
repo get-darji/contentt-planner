@@ -96,7 +96,7 @@ export const ContentDetailView = ({ task, onClose }) => {
 
         {/* Task Details Card */}
         <div className="ui-card" style={{ padding: '16px', marginBottom: '20px', background: 'var(--bg-main)' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', fontSize: '0.85rem' }}>
+          <div className="form-grid two-field-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', fontSize: '0.85rem' }}>
             <div>
               <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.72rem', fontWeight: 600 }}>Platform</span>
               <strong style={{ fontSize: '0.95rem' }}>{task.platform}</strong>

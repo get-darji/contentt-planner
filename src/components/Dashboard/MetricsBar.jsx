@@ -35,7 +35,7 @@ export const MetricsBar = () => {
   };
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '16px', marginBottom: '24px' }}>
+    <div className="metrics-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '16px', marginBottom: '24px' }}>
       
       {/* 1. Scheduled KPI Card -> Redirects to Content Table (Filtered: Scheduled) */}
       <div 

@@ -8,7 +8,7 @@ export const SettingsView = () => {
   const { workspace } = usePlanner();
 
   return (
-    <div style={{ padding: '0 32px 48px 32px', maxWidth: '900px', margin: '0 auto' }}>
+    <div className="page-container settings-page" style={{ padding: '0 32px 48px 32px', maxWidth: '900px', margin: '0 auto' }}>
       <div style={{ marginBottom: '28px' }}>
         <h2 style={{ fontSize: '1.65rem', fontWeight: 800 }}>Settings</h2>
         <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>

@@ -254,3 +254,374 @@ button, input, select, textarea {
   box-shadow: var(--shadow-dropdown);
   padding: 24px;
 }
+
+img, svg, video, canvas {
+  max-width: 100%;
+}
+
+.table-card {
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-card table {
+  min-width: 860px;
+}
+
+@media (max-width: 1180px) {
+  .metrics-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .dashboard-grid,
+  .analytics-charts-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .analytics-metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .three-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .app-header {
+    align-items: flex-start !important;
+  }
+
+  .header-tools {
+    width: 100% !important;
+    flex-wrap: wrap !important;
+  }
+
+  .global-search {
+    flex: 1 1 260px !important;
+    width: auto !important;
+  }
+}
+
+@media (max-width: 860px) {
+  body {
+    padding-bottom: 76px;
+  }
+
+  .app-shell {
+    display: block !important;
+    min-height: 100dvh !important;
+  }
+
+  .app-sidebar {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    top: auto !important;
+    width: 100% !important;
+    height: 72px !important;
+    min-height: 0 !important;
+    padding: 8px 10px calc(8px + env(safe-area-inset-bottom)) !important;
+    border-right: 0 !important;
+    border-top: 1px solid var(--border-color) !important;
+    z-index: 1200 !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    justify-content: center !important;
+  }
+
+  .app-sidebar > div:first-child {
+    width: 100% !important;
+  }
+
+  .app-sidebar > div:last-child,
+  .sidebar-brand {
+    display: none !important;
+  }
+
+  .sidebar-nav {
+    flex-direction: row !important;
+    gap: 6px !important;
+    width: max-content !important;
+    min-width: 100% !important;
+  }
+
+  .sidebar-nav-item {
+    min-width: 74px !important;
+    height: 54px !important;
+    padding: 6px 8px !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    border-right: 0 !important;
+    border-bottom: 3px solid transparent !important;
+    border-radius: 10px !important;
+    font-size: 0.68rem !important;
+    white-space: nowrap !important;
+  }
+
+  .sidebar-nav-item svg {
+    width: 17px !important;
+    height: 17px !important;
+  }
+
+  .app-header {
+    padding: 18px 16px 12px !important;
+    gap: 12px !important;
+  }
+
+  .header-title h1 {
+    font-size: 1.35rem !important;
+    line-height: 1.15 !important;
+  }
+
+  .header-title p {
+    font-size: 0.8rem !important;
+  }
+
+  .header-tools {
+    gap: 10px !important;
+    align-items: stretch !important;
+  }
+
+  .workspace-menu-wrap {
+    flex: 1 1 100% !important;
+  }
+
+  .workspace-menu-wrap > div:first-child {
+    width: 100% !important;
+    justify-content: flex-start !important;
+  }
+
+  .global-search {
+    order: 5;
+    flex: 1 1 100% !important;
+    width: 100% !important;
+  }
+
+  .header-tools .ui-card {
+    left: 0 !important;
+    right: auto !important;
+    width: min(100vw - 32px, 320px) !important;
+  }
+
+  .workspace-menu-wrap .ui-card,
+  .global-search .ui-card {
+    width: 100% !important;
+  }
+
+  .header-tools > div:not(.workspace-menu-wrap):not(.global-search) {
+    flex: 0 0 auto;
+  }
+
+  .page-container {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 16px auto 0 !important;
+    padding: 0 16px 28px !important;
+  }
+
+  .dashboard-page,
+  .content-page,
+  .library-page,
+  .templates-page,
+  .settings-page {
+    padding: 0 16px 28px !important;
+  }
+
+  .page-header-row,
+  .filter-bar,
+  .calendar-toolbar,
+  .analytics-toolbar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .page-header-row .btn,
+  .filter-bar .btn,
+  .calendar-toolbar .btn,
+  .analytics-toolbar .btn {
+    width: 100%;
+  }
+
+  .filter-search,
+  .filter-selects,
+  .filter-selects .form-select,
+  .filter-controls,
+  .filter-controls > div,
+  .calendar-controls {
+    width: 100% !important;
+  }
+
+  .filter-selects,
+  .filter-controls,
+  .calendar-controls {
+    flex-wrap: wrap !important;
+    align-items: stretch !important;
+  }
+
+  .filter-controls > div {
+    overflow-x: auto;
+    justify-content: flex-start !important;
+  }
+
+  .metrics-grid,
+  .analytics-metrics-grid,
+  .two-column-grid,
+  .two-card-grid,
+  .three-card-grid,
+  .dashboard-grid,
+  .analytics-charts-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .card-grid {
+    gap: 14px !important;
+  }
+
+  .ui-card,
+  .modal-container {
+    border-radius: 14px !important;
+  }
+
+  .compact-calendar-card {
+    padding: 16px !important;
+  }
+
+  .calendar-weekdays {
+    gap: 4px !important;
+  }
+
+  .calendar-weekdays > div {
+    font-size: 0.64rem !important;
+    letter-spacing: 0 !important;
+  }
+
+  .calendar-month-grid {
+    gap: 4px !important;
+  }
+
+  .calendar-month-grid > div {
+    min-height: 78px !important;
+    height: auto !important;
+    padding: 6px !important;
+    border-radius: 9px !important;
+  }
+
+  .compact-calendar-grid > div {
+    min-height: 58px !important;
+    height: 58px !important;
+    padding: 5px !important;
+  }
+
+  .calendar-month-grid > div span {
+    font-size: 0.68rem !important;
+  }
+
+  .calendar-month-grid .content-tile {
+    padding: 5px !important;
+    margin-bottom: 4px !important;
+  }
+
+  .calendar-month-grid .content-tile > div:nth-child(2),
+  .calendar-month-grid .content-tile > div:nth-child(3),
+  .calendar-month-grid .status-pill {
+    display: none !important;
+  }
+
+  .calendar-month-grid .content-tile > div:first-child {
+    margin-bottom: 0 !important;
+  }
+
+  .calendar-month-grid .content-tile svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
+
+  .form-grid,
+  .two-field-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 10px;
+  }
+
+  .modal-container {
+    max-height: 92dvh;
+    padding: 18px !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .app-header {
+    padding-top: 14px !important;
+  }
+
+  .header-title h1,
+  .page-container h2 {
+    font-size: 1.25rem !important;
+  }
+
+  .btn {
+    min-height: 40px;
+    padding: 9px 12px;
+  }
+
+  .metrics-grid .ui-card,
+  .analytics-metrics-grid .ui-card {
+    padding: 14px !important;
+  }
+
+  .calendar-page {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  .calendar-toolbar {
+    padding: 12px !important;
+  }
+
+  .calendar-controls > div,
+  .calendar-controls > button {
+    flex: 1 1 auto;
+  }
+
+  .calendar-controls select {
+    font-size: 0.9rem !important;
+  }
+
+  .calendar-month-grid > div {
+    min-height: 64px !important;
+    padding: 4px !important;
+  }
+
+  .compact-calendar-grid > div {
+    min-height: 48px !important;
+    height: 48px !important;
+  }
+
+  .calendar-month-grid > div span {
+    font-size: 0.62rem !important;
+  }
+
+  .calendar-month-grid > div span:first-child {
+    padding: 0 !important;
+  }
+
+  .calendar-month-grid .content-tile span {
+    display: none !important;
+  }
+
+  .calendar-month-grid [title] {
+    padding: 2px !important;
+  }
+
+  .table-card table {
+    min-width: 760px;
+  }
+
+  .library-page img {
+    height: 150px !important;
+  }
+}

@@ -102,7 +102,7 @@ export const CalendarGrid = ({ onOpenAddModal }) => {
   };
 
   return (
-    <div className="ui-card" style={{ padding: '24px', marginBottom: '24px' }}>
+    <div className="ui-card compact-calendar-card" style={{ padding: '24px', marginBottom: '24px' }}>
       
       {pastDateWarning && (
         <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', color: '#dc2626', padding: '10px 14px', borderRadius: '10px', fontSize: '0.85rem', fontWeight: 700, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -180,7 +180,7 @@ export const CalendarGrid = ({ onOpenAddModal }) => {
       </div>
 
       {/* Weekday Labels Header */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', textAlign: 'center', marginBottom: '8px' }}>
+      <div className="calendar-weekdays" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', textAlign: 'center', marginBottom: '8px' }}>
         {daysOfWeek.map(d => (
           <div key={d} style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', padding: '6px 0' }}>
             {d}
@@ -189,7 +189,7 @@ export const CalendarGrid = ({ onOpenAddModal }) => {
       </div>
 
       {/* Days Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '6px' }}>
+      <div className="calendar-month-grid compact-calendar-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '6px' }}>
         {calendarGrid.map((cell, idx) => {
           if (!cell.isCurrentMonth) {
             return (

@@ -29,7 +29,7 @@ export const Sidebar = () => {
   ];
 
   return (
-    <aside style={{
+    <aside className="app-sidebar" style={{
       width: collapsed ? '80px' : '260px',
       background: 'var(--bg-sidebar)',
       borderRight: '1px solid var(--border-color)',
@@ -46,7 +46,7 @@ export const Sidebar = () => {
     }}>
       <div>
         {/* Brand Logo Header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 12px', marginBottom: '28px' }}>
+        <div className="sidebar-brand" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 12px', marginBottom: '28px' }}>
           <div style={{
             width: '36px',
             height: '36px',
@@ -75,7 +75,7 @@ export const Sidebar = () => {
         </div>
 
         {/* Navigation Links */}
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        <nav className="sidebar-nav" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id || (activeTab === 'workspace' && item.id === 'workspaces');
@@ -84,6 +84,7 @@ export const Sidebar = () => {
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
+                className="sidebar-nav-item"
                 style={{
                   display: 'flex',
                   alignItems: 'center',

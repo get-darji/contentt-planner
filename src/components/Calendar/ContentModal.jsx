@@ -117,7 +117,7 @@ export const ContentModal = ({ isOpen, onClose, initialDate }) => {
           </div>
 
           {/* Date & Time Row */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div className="form-grid two-field-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
             <div className="form-group">
               <label className="form-label">Scheduled Date *</label>
               <input 

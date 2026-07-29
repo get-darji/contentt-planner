@@ -18,10 +18,10 @@ export const ContentView = ({ onOpenAddModal, onEditTask }) => {
   });
 
   return (
-    <div style={{ padding: '0 32px 48px 32px', maxWidth: '1600px', margin: '0 auto' }}>
+    <div className="page-container content-page" style={{ padding: '0 32px 48px 32px', maxWidth: '1600px', margin: '0 auto' }}>
       
       {/* Header & Controls */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
+      <div className="page-header-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <h2 style={{ fontSize: '1.65rem', fontWeight: 800 }}>Content Manager</h2>
           <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Manage all scheduled, published, and draft posts across social channels.</p>
@@ -33,8 +33,8 @@ export const ContentView = ({ onOpenAddModal, onEditTask }) => {
       </div>
 
       {/* Filter Bar */}
-      <div className="ui-card" style={{ padding: '16px 20px', marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
-        <div style={{ position: 'relative', width: '280px' }}>
+      <div className="ui-card filter-bar" style={{ padding: '16px 20px', marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+        <div className="filter-search" style={{ position: 'relative', width: '280px' }}>
           <input 
             type="text"
             className="form-input"
@@ -46,7 +46,7 @@ export const ContentView = ({ onOpenAddModal, onEditTask }) => {
           <Search size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div className="filter-selects" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <select 
             className="form-select"
             value={selectedPlatform}
@@ -77,7 +77,7 @@ export const ContentView = ({ onOpenAddModal, onEditTask }) => {
       </div>
 
       {/* Content Table */}
-      <div className="ui-card" style={{ overflow: 'hidden' }}>
+      <div className="ui-card table-card" style={{ overflow: 'hidden' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
           <thead>
             <tr style={{ background: 'var(--bg-main)', borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontWeight: 700 }}>

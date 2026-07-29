@@ -44,7 +44,7 @@ export const Header = () => {
   ) : [];
 
   return (
-    <header style={{
+    <header className="app-header" style={{
       background: 'transparent',
       padding: '24px 32px 16px 32px',
       display: 'flex',
@@ -56,7 +56,7 @@ export const Header = () => {
     }}>
       
       {/* Greeting & Tagline */}
-      <div>
+      <div className="header-title">
         <h1 style={{ fontSize: '1.65rem', fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
           Good morning, {user?.name ? user.name.split(' ')[0] : 'there'}!
         </h1>
@@ -66,10 +66,10 @@ export const Header = () => {
       </div>
 
       {/* Right Tools Widget */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+      <div className="header-tools" style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
         
         {/* Workspace Dropdown */}
-        <div style={{ position: 'relative' }}>
+        <div className="workspace-menu-wrap" style={{ position: 'relative' }}>
           <div 
             onClick={() => { setShowWorkspaceMenu(!showWorkspaceMenu); setShowNotifMenu(false); setShowProfileMenu(false); }}
             style={{
@@ -135,7 +135,7 @@ export const Header = () => {
         </div>
 
         {/* Global Search Input with Shortcut Badge & Dropdown Results */}
-        <div style={{ position: 'relative', width: '240px' }}>
+        <div className="global-search" style={{ position: 'relative', width: '240px' }}>
           <input 
             type="text"
             className="form-input"

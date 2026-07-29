@@ -7,7 +7,7 @@ import { QuickActions } from './QuickActions';
 
 export const DashboardView = ({ onOpenAddModal }) => {
   return (
-    <div style={{ padding: '0 32px 48px 32px', maxWidth: '1600px', margin: '0 auto' }}>
+    <div className="page-container dashboard-page" style={{ padding: '0 32px 48px 32px', maxWidth: '1600px', margin: '0 auto' }}>
       
       {/* 1. What's Next Horizontal Banner Card */}
       <WhatsNextBanner />
@@ -16,7 +16,7 @@ export const DashboardView = ({ onOpenAddModal }) => {
       <MetricsBar />
 
       {/* 3. Main Grid Layout (Calendar & Activity on left, Quick Actions on right) */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '24px' }}>
+      <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '24px' }}>
         
         {/* Left / Middle Section */}
         <div>

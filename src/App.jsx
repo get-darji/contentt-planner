@@ -43,13 +43,13 @@ const MainContent = () => {
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-main)' }}>
+    <div className="app-shell" style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-main)' }}>
       
       {/* Left Navigation Sidebar */}
       <Sidebar />
 
       {/* Main Content Body */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+      <div className="app-main" style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         
         {/* Top Header */}
         <Header />

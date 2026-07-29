@@ -22,8 +22,8 @@ export const ContentLibraryView = () => {
   };
 
   return (
-    <div style={{ padding: '0 32px 48px 32px', maxWidth: '1600px', margin: '0 auto' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+    <div className="page-container library-page" style={{ padding: '0 32px 48px 32px', maxWidth: '1600px', margin: '0 auto' }}>
+      <div className="page-header-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
         <div>
           <h2 style={{ fontSize: '1.65rem', fontWeight: 800 }}>Content Library</h2>
           <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Store and reuse brand assets, high-res images, video clips, and templates.</p>
@@ -34,7 +34,7 @@ export const ContentLibraryView = () => {
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+      <div className="card-grid three-card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
         {assets.map(asset => (
           <div key={asset.id} className="ui-card" style={{ overflow: 'hidden' }}>
             <img src={asset.url} alt={asset.title} style={{ width: '100%', height: '180px', objectFit: 'cover' }} />

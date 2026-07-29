@@ -12,13 +12,13 @@ export const TemplatesView = ({ onOpenAddModal }) => {
   ];
 
   return (
-    <div style={{ padding: '0 32px 48px 32px', maxWidth: '1600px', margin: '0 auto' }}>
+    <div className="page-container templates-page" style={{ padding: '0 32px 48px 32px', maxWidth: '1600px', margin: '0 auto' }}>
       <div style={{ marginBottom: '24px' }}>
         <h2 style={{ fontSize: '1.65rem', fontWeight: 800 }}>Content Templates</h2>
         <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Pre-built frameworks for rapid content creation.</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
+      <div className="card-grid two-card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
         {templates.map(t => (
           <div key={t.id} className="ui-card" style={{ padding: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>

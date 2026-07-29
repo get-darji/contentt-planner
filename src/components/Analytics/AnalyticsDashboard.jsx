@@ -74,10 +74,10 @@ export const AnalyticsDashboard = () => {
   const maxCount = Math.max(...platformCounts.map(p => p.count), 1);
 
   return (
-    <div style={{ maxWidth: '1300px', margin: '32px auto', padding: '0 24px' }}>
+    <div className="page-container analytics-page" style={{ maxWidth: '1300px', margin: '32px auto', padding: '0 24px' }}>
       
       {/* Top Header & Analytics Time Range Toolbar */}
-      <div className="ui-card" style={{ padding: '20px 24px', marginBottom: '28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+      <div className="ui-card analytics-toolbar" style={{ padding: '20px 24px', marginBottom: '28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <h2 style={{ fontSize: '1.65rem', fontWeight: 800 }}>Content Performance Analytics</h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '2px' }}>
@@ -88,7 +88,7 @@ export const AnalyticsDashboard = () => {
         </div>
 
         {/* Dynamic Time Range & Platform Filter Controls */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+        <div className="filter-controls" style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
           
           {/* Time Filter Mode Dropdown */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--bg-main)', padding: '6px 12px', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
@@ -163,7 +163,7 @@ export const AnalyticsDashboard = () => {
       </div>
 
       {/* Metrics Top Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '32px' }}>
+      <div className="analytics-metrics-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '32px' }}>
         
         {/* Card 1: Total Posts */}
         <div className="ui-card" style={{ padding: '20px' }}>
@@ -224,7 +224,7 @@ export const AnalyticsDashboard = () => {
       </div>
 
       {/* Visual Graphs & Charts Section */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '24px' }}>
+      <div className="analytics-charts-grid" style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '24px' }}>
         
         {/* Chart 1: Platform Content Distribution Bar Chart */}
         <div className="ui-card" style={{ padding: '24px' }}>
