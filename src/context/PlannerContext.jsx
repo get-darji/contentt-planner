@@ -82,27 +82,47 @@ const getInitialWorkspaces = (userEmail) => {
 export const PlannerProvider = ({ children }) => {
   const { user } = useAuth();
 
-  const [allWorkspaces, setAllWorkspaces] = useState(INITIAL_WORKSPACES);
-  const [currentWorkspace, setCurrentWorkspace] = useState(INITIAL_WORKSPACES[0]);
-  const [allTasks, setAllTasks] = useState([]);
-  const [allIdeas, setAllIdeas] = useState([]);
+  // Offline-first state initialization from localStorage
+  const [allWorkspaces, setAllWorkspaces] = useState(() => {
+    const saved = localStorage.getItem('darji_workspaces');
+    return saved ? JSON.parse(saved) : INITIAL_WORKSPACES;
+  });
+
+  const [currentWorkspace, setCurrentWorkspace] = useState(() => {
+    const saved = localStorage.getItem('darji_workspaces');
+    const parsed = saved ? JSON.parse(saved) : INITIAL_WORKSPACES;
+    return parsed[0];
+  });
+
+  const [allTasks, setAllTasks] = useState(() => {
+    const saved = localStorage.getItem('darji_tasks');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [allIdeas, setAllIdeas] = useState(() => {
+    const saved = localStorage.getItem('darji_ideas');
+    return saved ? JSON.parse(saved) : [];
+  });
+
   const [notifications, setNotifications] = useState([]);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [platformFilter, setPlatformFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
   const [isIdeaModalOpen, setIsIdeaModalOpen] = useState(false);
 
-  // 1. Fetch Workspaces on Login
+  // 1. Fetch Workspaces on Login with localStorage backup
   useEffect(() => {
     const fetchWorkspaces = async () => {
       if (!user) return;
       try {
         const res = await fetch(`${API_BASE}/workspaces?email=${encodeURIComponent(user.email)}`);
+        if (!res.ok) throw new Error('API server returned non-ok response');
         const data = await res.json();
         
         const hasOwned = data.some(ws => ws.ownerEmail.toLowerCase() === user.email.toLowerCase());
+        let finalWorkspaces = data;
         if (!hasOwned) {
-          // Initialize default workspaces in database for this user
+          // Initialize default workspaces in database
           const defaults = getInitialWorkspaces(user.email);
           const savedList = [...data];
           for (const ws of defaults) {
@@ -114,12 +134,21 @@ export const PlannerProvider = ({ children }) => {
             const savedWs = await postRes.json();
             savedList.push(savedWs);
           }
-          setAllWorkspaces(savedList);
-        } else {
-          setAllWorkspaces(data);
+          finalWorkspaces = savedList;
         }
+        setAllWorkspaces(finalWorkspaces);
+        localStorage.setItem('darji_workspaces', JSON.stringify(finalWorkspaces));
       } catch (err) {
-        console.error('Failed to load workspaces from MongoDB:', err);
+        console.error('Failed to load workspaces from MongoDB, using localStorage:', err);
+        const saved = localStorage.getItem('darji_workspaces');
+        if (saved) {
+          setAllWorkspaces(JSON.parse(saved));
+        } else {
+          // Generate defaults offline
+          const defaults = getInitialWorkspaces(user.email);
+          setAllWorkspaces(defaults);
+          localStorage.setItem('darji_workspaces', JSON.stringify(defaults));
+        }
       }
     };
     fetchWorkspaces();
@@ -127,8 +156,8 @@ export const PlannerProvider = ({ children }) => {
 
   const activeWorkspaces = user 
     ? allWorkspaces.filter(ws => 
-        ws.ownerEmail.toLowerCase() === user.email.toLowerCase() ||
-        (ws.teamMembers || []).some(m => m.email.toLowerCase() === user.email.toLowerCase())
+        (ws.ownerEmail && ws.ownerEmail.toLowerCase() === user.email.toLowerCase()) ||
+        (ws.teamMembers || []).some(m => m.email && m.email.toLowerCase() === user.email.toLowerCase())
       )
     : [];
 
@@ -146,20 +175,48 @@ export const PlannerProvider = ({ children }) => {
     }
   }, [activeWorkspaces, currentWorkspace]);
 
-  // 2. Fetch Tasks and Ideas on active Workspace change
+  // 2. Fetch Tasks and Ideas on active Workspace change with localStorage backup
   useEffect(() => {
     const fetchTasksAndIdeas = async () => {
       if (!currentWorkspace) return;
       try {
         const tasksRes = await fetch(`${API_BASE}/tasks?workspaceId=${encodeURIComponent(currentWorkspace.id)}`);
+        if (!tasksRes.ok) throw new Error('API tasks fetch failed');
         const tasksData = await tasksRes.json();
         setAllTasks(processTaskStatuses(tasksData));
+        
+        // Mirror current workspace tasks in global darji_tasks localStorage
+        const savedTasks = localStorage.getItem('darji_tasks');
+        let parsed = savedTasks ? JSON.parse(savedTasks) : [];
+        parsed = parsed.filter(t => t.workspaceId !== currentWorkspace.id);
+        const merged = [...tasksData, ...parsed];
+        localStorage.setItem('darji_tasks', JSON.stringify(merged));
 
         const ideasRes = await fetch(`${API_BASE}/ideas?workspaceId=${encodeURIComponent(currentWorkspace.id)}`);
+        if (!ideasRes.ok) throw new Error('API ideas fetch failed');
         const ideasData = await ideasRes.json();
         setAllIdeas(ideasData);
+
+        // Mirror current workspace ideas in global darji_ideas localStorage
+        const savedIdeas = localStorage.getItem('darji_ideas');
+        let parsedIdeas = savedIdeas ? JSON.parse(savedIdeas) : [];
+        parsedIdeas = parsedIdeas.filter(idea => idea.workspaceId !== currentWorkspace.id);
+        const mergedIdeas = [...ideasData, ...parsedIdeas];
+        localStorage.setItem('darji_ideas', JSON.stringify(mergedIdeas));
       } catch (err) {
-        console.error('Failed to load tasks and ideas from MongoDB:', err);
+        console.error('Failed to load tasks and ideas from MongoDB, using localStorage:', err);
+        const savedTasks = localStorage.getItem('darji_tasks');
+        if (savedTasks) {
+          const parsed = JSON.parse(savedTasks);
+          const filtered = parsed.filter(t => t.workspaceId === currentWorkspace.id);
+          setAllTasks(processTaskStatuses(filtered));
+        }
+        const savedIdeas = localStorage.getItem('darji_ideas');
+        if (savedIdeas) {
+          const parsed = JSON.parse(savedIdeas);
+          const filtered = parsed.filter(idea => idea.workspaceId === currentWorkspace.id);
+          setAllIdeas(filtered);
+        }
       }
     };
     fetchTasksAndIdeas();
@@ -188,7 +245,7 @@ export const PlannerProvider = ({ children }) => {
 
   const teamMembers = currentWorkspace ? (currentWorkspace.teamMembers || []) : [];
 
-  // Operations via REST API
+  // Operations via REST API with Offline-First localStorage fallbacks
 
   const addTeamMember = async (email, name) => {
     if (!currentWorkspace) return;
@@ -202,35 +259,55 @@ export const PlannerProvider = ({ children }) => {
       throw new Error('Cannot add the workspace owner to the team.');
     }
 
+    const newMember = {
+      email: email.trim(),
+      name: name.trim() || email.split('@')[0],
+      role: 'planner',
+      addedAt: new Date().toISOString().split('T')[0]
+    };
+
+    const updatedWorkspace = {
+      ...currentWorkspace,
+      teamMembers: [...(currentWorkspace.teamMembers || []), newMember]
+    };
+
+    // Update state & localStorage first
+    setAllWorkspaces(prev => {
+      const list = prev.map(ws => ws.id === currentWorkspace.id ? updatedWorkspace : ws);
+      localStorage.setItem('darji_workspaces', JSON.stringify(list));
+      return list;
+    });
+
     try {
-      const res = await fetch(`${API_BASE}/workspaces/${currentWorkspace.id}/team`, {
+      await fetch(`${API_BASE}/workspaces/${currentWorkspace.id}/team`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, name })
       });
-      const updatedWorkspace = await res.json();
-      if (res.ok) {
-        setAllWorkspaces(prev => prev.map(ws => ws.id === currentWorkspace.id ? updatedWorkspace : ws));
-      } else {
-        throw new Error(updatedWorkspace.error || 'Failed to add team member.');
-      }
     } catch (err) {
-      throw err;
+      console.error('Failed to add team member to MongoDB, saved locally:', err);
     }
   };
 
   const removeTeamMember = async (email) => {
     if (!currentWorkspace) return;
+    const updatedWorkspace = {
+      ...currentWorkspace,
+      teamMembers: (currentWorkspace.teamMembers || []).filter(m => m.email.toLowerCase() !== email.toLowerCase())
+    };
+
+    setAllWorkspaces(prev => {
+      const list = prev.map(ws => ws.id === currentWorkspace.id ? updatedWorkspace : ws);
+      localStorage.setItem('darji_workspaces', JSON.stringify(list));
+      return list;
+    });
+
     try {
-      const res = await fetch(`${API_BASE}/workspaces/${currentWorkspace.id}/team/${encodeURIComponent(email)}`, {
+      await fetch(`${API_BASE}/workspaces/${currentWorkspace.id}/team/${encodeURIComponent(email)}`, {
         method: 'DELETE'
       });
-      const updatedWorkspace = await res.json();
-      if (res.ok) {
-        setAllWorkspaces(prev => prev.map(ws => ws.id === currentWorkspace.id ? updatedWorkspace : ws));
-      }
     } catch (err) {
-      console.error('Failed to remove team member:', err);
+      console.error('Failed to remove team member from MongoDB:', err);
     }
   };
 
@@ -255,45 +332,53 @@ export const PlannerProvider = ({ children }) => {
       status: initialStatus
     };
 
+    // Update state & localStorage first
+    setAllTasks(prev => {
+      const list = [taskData, ...prev];
+      localStorage.setItem('darji_tasks', JSON.stringify(list));
+      return list;
+    });
+
+    const newNotif = {
+      id: 'notif_' + Date.now(),
+      title: 'Content Scheduled',
+      message: `"${taskData.title}" was scheduled for ${taskData.platform} at ${taskData.scheduledTime || '12:00'}.`,
+      time: 'Just now',
+      read: false
+    };
+    setNotifications(prev => [newNotif, ...prev]);
+
     try {
-      const res = await fetch(`${API_BASE}/tasks`, {
+      await fetch(`${API_BASE}/tasks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(taskData)
       });
-      const savedTask = await res.json();
-      setAllTasks(prev => [savedTask, ...prev]);
-
-      const newNotif = {
-        id: 'notif_' + Date.now(),
-        title: 'Content Scheduled',
-        message: `"${savedTask.title}" was scheduled for ${savedTask.platform} at ${savedTask.scheduledTime || '12:00'}.`,
-        time: 'Just now',
-        read: false
-      };
-      setNotifications(prev => [newNotif, ...prev]);
-      return savedTask;
     } catch (err) {
       console.error('Failed to add task to MongoDB:', err);
     }
+    return taskData;
   };
 
   const updateTask = async (id, updatedFields) => {
-    // Optimistic UI updates
-    setAllTasks(prev => prev.map(t => {
-      if (t.id === id) {
-        const merged = { ...t, ...updatedFields };
-        if (merged.status === 'scheduled') {
-          const deadlineMs = getTaskDeadlineTimestamp(merged.scheduledDate, merged.scheduledTime);
-          const expirationMs = deadlineMs + GRACE_PERIOD_MS;
-          if (Date.now() >= expirationMs) {
-            merged.status = 'missed';
+    setAllTasks(prev => {
+      const list = prev.map(t => {
+        if (t.id === id) {
+          const merged = { ...t, ...updatedFields };
+          if (merged.status === 'scheduled') {
+            const deadlineMs = getTaskDeadlineTimestamp(merged.scheduledDate, merged.scheduledTime);
+            const expirationMs = deadlineMs + GRACE_PERIOD_MS;
+            if (Date.now() >= expirationMs) {
+              merged.status = 'missed';
+            }
           }
+          return merged;
         }
-        return merged;
-      }
-      return t;
-    }));
+        return t;
+      });
+      localStorage.setItem('darji_tasks', JSON.stringify(list));
+      return list;
+    });
 
     try {
       await fetch(`${API_BASE}/tasks/${id}`, {
@@ -307,7 +392,12 @@ export const PlannerProvider = ({ children }) => {
   };
 
   const deleteTask = async (id) => {
-    setAllTasks(prev => prev.filter(t => t.id !== id));
+    setAllTasks(prev => {
+      const list = prev.filter(t => t.id !== id);
+      localStorage.setItem('darji_tasks', JSON.stringify(list));
+      return list;
+    });
+
     try {
       await fetch(`${API_BASE}/tasks/${id}`, {
         method: 'DELETE'
@@ -327,14 +417,18 @@ export const PlannerProvider = ({ children }) => {
       workspaceId: currentWorkspace.id
     };
 
+    setAllIdeas(prev => {
+      const list = [ideaData, ...prev];
+      localStorage.setItem('darji_ideas', JSON.stringify(list));
+      return list;
+    });
+
     try {
-      const res = await fetch(`${API_BASE}/ideas`, {
+      await fetch(`${API_BASE}/ideas`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(ideaData)
       });
-      const savedIdea = await res.json();
-      setAllIdeas(prev => [savedIdea, ...prev]);
     } catch (err) {
       console.error('Failed to add idea to MongoDB:', err);
     }
@@ -346,16 +440,20 @@ export const PlannerProvider = ({ children }) => {
 
   const updateWorkspaceName = async (name, handle) => {
     if (!currentWorkspace) return;
+    const updatedWorkspace = { ...currentWorkspace, name, handle };
+
+    setAllWorkspaces(prev => {
+      const list = prev.map(ws => ws.id === currentWorkspace.id ? updatedWorkspace : ws);
+      localStorage.setItem('darji_workspaces', JSON.stringify(list));
+      return list;
+    });
+
     try {
-      const res = await fetch(`${API_BASE}/workspaces/${currentWorkspace.id}`, {
+      await fetch(`${API_BASE}/workspaces/${currentWorkspace.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, handle })
       });
-      const updatedWorkspace = await res.json();
-      if (res.ok) {
-        setAllWorkspaces(prev => prev.map(ws => ws.id === currentWorkspace.id ? updatedWorkspace : ws));
-      }
     } catch (err) {
       console.error('Failed to update workspace details:', err);
     }
@@ -372,6 +470,14 @@ export const PlannerProvider = ({ children }) => {
       teamMembers: []
     };
 
+    // Update state & localStorage first
+    setAllWorkspaces(prev => {
+      const list = [...prev, wsData];
+      localStorage.setItem('darji_workspaces', JSON.stringify(list));
+      return list;
+    });
+    setCurrentWorkspace(wsData);
+
     try {
       const res = await fetch(`${API_BASE}/workspaces`, {
         method: 'POST',
@@ -379,7 +485,11 @@ export const PlannerProvider = ({ children }) => {
         body: JSON.stringify(wsData)
       });
       const savedWs = await res.json();
-      setAllWorkspaces(prev => [...prev, savedWs]);
+      setAllWorkspaces(prev => {
+        const list = prev.map(ws => ws.id === wsData.id ? savedWs : ws);
+        localStorage.setItem('darji_workspaces', JSON.stringify(list));
+        return list;
+      });
       setCurrentWorkspace(savedWs);
       return savedWs;
     } catch (err) {

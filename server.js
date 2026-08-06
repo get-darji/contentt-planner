@@ -13,7 +13,8 @@ app.use(express.json());
 
 // MongoDB Connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/darji';
-mongoose.connect(MONGODB_URI)
+mongoose.set('bufferCommands', false); // Disable command buffering so queries fail immediately instead of hanging when offline
+mongoose.connect(MONGODB_URI, { serverSelectionTimeoutMS: 2000 })
   .then(() => console.log('Connected to MongoDB database successfully!'))
   .catch(err => console.error('MongoDB connection error:', err));
 
