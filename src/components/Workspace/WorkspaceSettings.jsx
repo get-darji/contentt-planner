@@ -19,12 +19,18 @@ export const WorkspaceSettings = () => {
     teamMembers, 
     isPlanner, 
     addTeamMember, 
-    removeTeamMember 
+    removeTeamMember,
+    createWorkspace
   } = usePlanner();
 
   const [wsName, setWsName] = useState(workspace.name);
   const [wsHandle, setWsHandle] = useState(workspace.handle);
   const [saveWsMsg, setSaveWsMsg] = useState('');
+
+  const [newWsName, setNewWsName] = useState('');
+  const [newWsHandle, setNewWsHandle] = useState('');
+  const [newWsCategory, setNewWsCategory] = useState('Creator Studio');
+  const [createWsSuccess, setCreateWsSuccess] = useState('');
 
   const [newEmail, setNewEmail] = useState('');
   const [newName, setNewName] = useState('');
@@ -37,6 +43,23 @@ export const WorkspaceSettings = () => {
     updateWorkspaceName(wsName, wsHandle);
     setSaveWsMsg('Workspace settings saved successfully!');
     setTimeout(() => setSaveWsMsg(''), 3000);
+  };
+
+  const handleCreateWorkspace = async (e) => {
+    e.preventDefault();
+    setCreateWsSuccess('');
+    if (!newWsName.trim() || !newWsHandle.trim()) return;
+
+    try {
+      await createWorkspace(newWsName, newWsHandle, newWsCategory);
+      setCreateWsSuccess('Workspace created and switched successfully!');
+      setNewWsName('');
+      setNewWsHandle('');
+      setNewWsCategory('Creator Studio');
+      setTimeout(() => setCreateWsSuccess(''), 3000);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleAddTeamMember = (e) => {
@@ -264,6 +287,73 @@ export const WorkspaceSettings = () => {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* 3. Create New Workspace */}
+      <div className="glass-panel" style={{ padding: '24px', background: '#ffffff', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-card)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+          <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ffffff' }}>
+            <UserPlus size={24} />
+          </div>
+          <div>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              Create New Workspace
+            </h3>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Launch a brand new isolated content calendar</span>
+          </div>
+        </div>
+
+        {createWsSuccess && (
+          <div style={{ background: '#dcfce7', border: '1px solid #6ee7b7', color: '#059669', padding: '10px 14px', borderRadius: '10px', fontSize: '0.85rem', fontWeight: 700, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <CheckCircle2 size={16} /> {createWsSuccess}
+          </div>
+        )}
+
+        <form onSubmit={handleCreateWorkspace}>
+          <div className="form-group">
+            <label className="form-label">New Workspace Name *</label>
+            <input
+              type="text"
+              className="form-input"
+              placeholder="e.g. My Side Hustle / Client B"
+              value={newWsName}
+              onChange={(e) => setNewWsName(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="form-grid two-field-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="form-group">
+              <label className="form-label">Brand Handle / Slug *</label>
+              <input
+                type="text"
+                className="form-input"
+                placeholder="e.g. @my_brand"
+                value={newWsHandle}
+                onChange={(e) => setNewWsHandle(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Workspace Category</label>
+              <select
+                className="form-select"
+                value={newWsCategory}
+                onChange={(e) => setNewWsCategory(e.target.value)}
+              >
+                <option value="Creator Studio">Creator Studio</option>
+                <option value="Creator Workspace">Creator Workspace</option>
+                <option value="Agency Client">Agency Client</option>
+                <option value="Personal Brand">Personal Brand</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" className="btn btn-orange-primary" style={{ width: '100%', marginTop: '8px', background: '#10b981', borderColor: '#10b981', boxShadow: '0 4px 14px rgba(16, 185, 129, 0.3)' }}>
+            Create Workspace Now
+          </button>
+        </form>
       </div>
 
     </div>

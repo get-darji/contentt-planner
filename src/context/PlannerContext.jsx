@@ -361,6 +361,32 @@ export const PlannerProvider = ({ children }) => {
     }
   };
 
+  const createWorkspace = async (name, handle, category = 'Creator Studio') => {
+    if (!user) return;
+    const wsData = {
+      id: 'ws_' + Date.now(),
+      name,
+      handle: handle.startsWith('@') ? handle : '@' + handle,
+      category,
+      ownerEmail: user.email,
+      teamMembers: []
+    };
+
+    try {
+      const res = await fetch(`${API_BASE}/workspaces`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(wsData)
+      });
+      const savedWs = await res.json();
+      setAllWorkspaces(prev => [...prev, savedWs]);
+      setCurrentWorkspace(savedWs);
+      return savedWs;
+    } catch (err) {
+      console.error('Failed to create workspace in MongoDB:', err);
+    }
+  };
+
   return (
     <PlannerContext.Provider value={{
       tasks: allTasks,
@@ -381,6 +407,7 @@ export const PlannerProvider = ({ children }) => {
       addIdea,
       markAllNotificationsRead,
       updateWorkspaceName,
+      createWorkspace,
       isIdeaModalOpen,
       setIsIdeaModalOpen,
       teamMembers,
