@@ -17,7 +17,8 @@ export const ContentModal = ({ isOpen, onClose, initialDate, editingTask }) => {
     scheduledTime: '12:00',
     description: '',
     assignee: assigneeName,
-    contentLink: ''
+    contentLink: '',
+    status: 'scheduled'
   });
 
   const [errorMsg, setErrorMsg] = useState('');
@@ -31,7 +32,8 @@ export const ContentModal = ({ isOpen, onClose, initialDate, editingTask }) => {
         scheduledTime: editingTask.scheduledTime || '12:00',
         description: editingTask.description || '',
         assignee: editingTask.assignee || assigneeName,
-        contentLink: editingTask.contentLink || ''
+        contentLink: editingTask.contentLink || '',
+        status: editingTask.status || 'scheduled'
       });
     } else {
       setFormData({
@@ -41,7 +43,8 @@ export const ContentModal = ({ isOpen, onClose, initialDate, editingTask }) => {
         scheduledTime: '12:00',
         description: '',
         assignee: assigneeName,
-        contentLink: ''
+        contentLink: '',
+        status: 'scheduled'
       });
     }
     setErrorMsg('');
@@ -74,12 +77,13 @@ export const ContentModal = ({ isOpen, onClose, initialDate, editingTask }) => {
         scheduledDate: formData.scheduledDate,
         scheduledTime: formData.scheduledTime,
         description: formData.description,
-        contentLink: formData.contentLink
+        contentLink: formData.contentLink,
+        status: formData.status
       });
     } else {
       addTask({
         ...formData,
-        status: 'scheduled'
+        status: formData.status || 'scheduled'
       });
     }
 
@@ -129,21 +133,36 @@ export const ContentModal = ({ isOpen, onClose, initialDate, editingTask }) => {
             />
           </div>
 
-          {/* Platform */}
-          <div className="form-group">
-            <label className="form-label">Social Platform</label>
-            <select 
-              className="form-select"
-              value={formData.platform}
-              onChange={(e) => setFormData({ ...formData, platform: e.target.value })}
-            >
-              <option value="Instagram">Instagram</option>
-              <option value="YouTube">YouTube</option>
-              <option value="LinkedIn">LinkedIn</option>
-              <option value="Twitter">X / Twitter</option>
-              <option value="TikTok">TikTok</option>
-              <option value="Facebook">Facebook</option>
-            </select>
+          {/* Platform & Status Row */}
+          <div className="form-grid two-field-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="form-group">
+              <label className="form-label">Social Platform</label>
+              <select 
+                className="form-select"
+                value={formData.platform}
+                onChange={(e) => setFormData({ ...formData, platform: e.target.value })}
+              >
+                <option value="Instagram">Instagram</option>
+                <option value="YouTube">YouTube</option>
+                <option value="LinkedIn">LinkedIn</option>
+                <option value="Twitter">X / Twitter</option>
+                <option value="TikTok">TikTok</option>
+                <option value="Facebook">Facebook</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Post Status</label>
+              <select 
+                className="form-select"
+                value={formData.status}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+              >
+                <option value="scheduled">Scheduled</option>
+                <option value="published">Published</option>
+                <option value="missed">Missed</option>
+              </select>
+            </div>
           </div>
 
           {/* Date & Time Row */}

@@ -145,8 +145,17 @@ export const ContentDetailView = ({ task, onClose }) => {
               </strong>
             </div>
             <div>
-              <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.72rem', fontWeight: 600 }}>Status</span>
-              <strong style={{ textTransform: 'capitalize' }}>{task.status}</strong>
+              <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.72rem', fontWeight: 600, marginBottom: '4px' }}>Change Status</span>
+              <select
+                className="form-select"
+                style={{ padding: '4px 8px', fontSize: '0.8rem', height: '32px' }}
+                value={task.status}
+                onChange={(e) => updateTask(task.id, { status: e.target.value })}
+              >
+                <option value="scheduled">Scheduled</option>
+                <option value="published">Published</option>
+                <option value="missed">Missed</option>
+              </select>
             </div>
           </div>
 

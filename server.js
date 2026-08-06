@@ -69,11 +69,12 @@ app.get('/api/workspaces', async (req, res) => {
     return res.status(400).json({ error: 'Email parameter is required.' });
   }
   try {
-    const userEmail = email.toLowerCase();
+    const userEmail = email.toLowerCase().trim();
+    const emailRegex = new RegExp(`^${userEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
     const workspaces = await Workspace.find({
       $or: [
-        { ownerEmail: userEmail },
-        { 'teamMembers.email': userEmail }
+        { ownerEmail: emailRegex },
+        { 'teamMembers.email': emailRegex }
       ]
     });
     res.json(workspaces);
@@ -90,7 +91,7 @@ app.post('/api/workspaces', async (req, res) => {
       name,
       handle,
       category: category || 'Creator Studio',
-      ownerEmail: ownerEmail.toLowerCase(),
+      ownerEmail: ownerEmail.toLowerCase().trim(),
       teamMembers: teamMembers || []
     });
     await newWorkspace.save();
@@ -132,7 +133,7 @@ app.post('/api/workspaces/:id/team', async (req, res) => {
     }
 
     const newMember = {
-      email: email.trim(),
+      email: trimmedEmail,
       name: name.trim() || email.split('@')[0],
       role: role || 'planner',
       addedAt: addedAt || new Date().toISOString().split('T')[0]
