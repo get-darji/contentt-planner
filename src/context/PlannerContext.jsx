@@ -60,76 +60,149 @@ export const processTaskStatuses = (taskList) => {
 };
 
 const INITIAL_WORKSPACES = [
-  { id: 'ws_1', name: 'Personal Brand', handle: '@personal_brand', category: 'Creator Studio' },
-  { id: 'ws_2', name: 'Content HQ', handle: '@content_hq', category: 'Creator Workspace' }
+  { id: 'ws_1', name: 'Personal Brand', handle: '@personal_brand', category: 'Creator Studio', ownerEmail: 'owner@example.com', teamMembers: [
+    { email: 'planner@example.com', name: 'Sam Planner', role: 'planner', addedAt: new Date().toISOString().split('T')[0] }
+  ] },
+  { id: 'ws_2', name: 'Content HQ', handle: '@content_hq', category: 'Creator Workspace', ownerEmail: 'owner@example.com', teamMembers: [] }
 ];
+
+const getInitialWorkspaces = (userEmail) => {
+  const defaultTeam = userEmail.toLowerCase() === 'owner@example.com' ? [
+    { email: 'planner@example.com', name: 'Sam Planner', role: 'planner', addedAt: new Date().toISOString().split('T')[0] }
+  ] : [];
+
+  return [
+    { id: 'ws_1_' + userEmail.replace(/[@.]/g, '_'), name: 'Personal Brand', handle: '@personal_brand', category: 'Creator Studio', ownerEmail: userEmail, teamMembers: defaultTeam },
+    { id: 'ws_2_' + userEmail.replace(/[@.]/g, '_'), name: 'Content HQ', handle: '@content_hq', category: 'Creator Workspace', ownerEmail: userEmail, teamMembers: [] }
+  ];
+};
 
 export const PlannerProvider = ({ children }) => {
   const { user } = useAuth();
 
-  const [teamMembers, setTeamMembers] = useState(() => {
-    const saved = localStorage.getItem('darji_team_members');
-    if (saved) return JSON.parse(saved);
-    return [
-      { email: 'planner@example.com', name: 'Sam Planner', role: 'planner', addedAt: new Date().toISOString().split('T')[0] }
-    ];
+  // 1. Workspaces State & Invite Check
+  const [allWorkspaces, setAllWorkspaces] = useState(() => {
+    const saved = localStorage.getItem('darji_workspaces');
+    return saved ? JSON.parse(saved) : INITIAL_WORKSPACES;
   });
 
   useEffect(() => {
-    localStorage.setItem('darji_team_members', JSON.stringify(teamMembers));
-  }, [teamMembers]);
+    localStorage.setItem('darji_workspaces', JSON.stringify(allWorkspaces));
+  }, [allWorkspaces]);
 
-  const isPlanner = user ? teamMembers.some(member => member.email.toLowerCase() === user.email.toLowerCase()) : false;
+  // Ensure logged in user has their workspaces initialized
+  useEffect(() => {
+    if (!user) return;
+    const hasWorkspaces = allWorkspaces.some(ws => 
+      ws.ownerEmail.toLowerCase() === user.email.toLowerCase() ||
+      (ws.teamMembers || []).some(m => m.email.toLowerCase() === user.email.toLowerCase())
+    );
+    if (!hasWorkspaces) {
+      const initial = getInitialWorkspaces(user.email);
+      setAllWorkspaces(prev => {
+        const filteredPrev = prev.filter(ws => !initial.some(i => i.id === ws.id));
+        return [...filteredPrev, ...initial];
+      });
+    }
+  }, [user, allWorkspaces]);
+
+  const activeWorkspaces = user 
+    ? allWorkspaces.filter(ws => 
+        ws.ownerEmail.toLowerCase() === user.email.toLowerCase() ||
+        (ws.teamMembers || []).some(m => m.email.toLowerCase() === user.email.toLowerCase())
+      )
+    : [];
+
+  const [currentWorkspace, setCurrentWorkspace] = useState(INITIAL_WORKSPACES[0]);
+
+  useEffect(() => {
+    if (activeWorkspaces.length > 0) {
+      if (!currentWorkspace || !activeWorkspaces.some(ws => ws.id === currentWorkspace.id)) {
+        setCurrentWorkspace(activeWorkspaces[0]);
+      } else {
+        const updated = activeWorkspaces.find(ws => ws.id === currentWorkspace.id);
+        if (JSON.stringify(updated) !== JSON.stringify(currentWorkspace)) {
+          setCurrentWorkspace(updated);
+        }
+      }
+    }
+  }, [activeWorkspaces, currentWorkspace]);
+
+  // Derive Planner state from current active workspace
+  const isPlanner = user && currentWorkspace
+    ? currentWorkspace.ownerEmail.toLowerCase() !== user.email.toLowerCase() &&
+      (currentWorkspace.teamMembers || []).some(m => m.email.toLowerCase() === user.email.toLowerCase() && m.role === 'planner')
+    : false;
+
+  const teamMembers = currentWorkspace ? (currentWorkspace.teamMembers || []) : [];
 
   const addTeamMember = (email, name) => {
+    if (!currentWorkspace) return;
     const trimmedEmail = email.trim().toLowerCase();
-    if (teamMembers.some(m => m.email.toLowerCase() === trimmedEmail)) {
+    const team = currentWorkspace.teamMembers || [];
+
+    if (team.some(m => m.email.toLowerCase() === trimmedEmail)) {
       throw new Error('This email is already added to the team.');
     }
+    if (currentWorkspace.ownerEmail.toLowerCase() === trimmedEmail) {
+      throw new Error('Cannot add the workspace owner to the team.');
+    }
+
     const newMember = {
       email: email.trim(),
       name: name.trim() || email.split('@')[0],
       role: 'planner',
       addedAt: new Date().toISOString().split('T')[0]
     };
-    setTeamMembers(prev => [...prev, newMember]);
+
+    setAllWorkspaces(prev => prev.map(ws => {
+      if (ws.id === currentWorkspace.id) {
+        return {
+          ...ws,
+          teamMembers: [...(ws.teamMembers || []), newMember]
+        };
+      }
+      return ws;
+    }));
   };
 
   const removeTeamMember = (email) => {
-    setTeamMembers(prev => prev.filter(m => m.email.toLowerCase() !== email.toLowerCase()));
+    if (!currentWorkspace) return;
+    const trimmedEmail = email.trim().toLowerCase();
+
+    setAllWorkspaces(prev => prev.map(ws => {
+      if (ws.id === currentWorkspace.id) {
+        return {
+          ...ws,
+          teamMembers: (ws.teamMembers || []).filter(m => m.email.toLowerCase() !== trimmedEmail)
+        };
+      }
+      return ws;
+    }));
   };
 
-  const [tasks, setTasks] = useState(() => {
+  // 2. Tasks State (Global store, filtered by workspace on export)
+  const [allTasks, setAllTasks] = useState(() => {
     const saved = localStorage.getItem('darji_tasks');
     if (!saved) return [];
     try {
       const parsed = JSON.parse(saved);
-      if (parsed.some(t => t.id === 'task_101' || t.id === 'task_1' || t.id === 'task_102')) {
-        return [];
-      }
-      return processTaskStatuses(parsed);
+      // Migrate legacy tasks
+      const migrated = parsed.map(t => {
+        if (!t.workspaceId) {
+          return { ...t, workspaceId: 'ws_1' };
+        }
+        return t;
+      });
+      return processTaskStatuses(migrated);
     } catch (e) {
       return [];
     }
   });
 
-  const [ideas, setIdeas] = useState([]);
-  const [notifications, setNotifications] = useState([]);
-  
-  const [workspaces, setWorkspaces] = useState(INITIAL_WORKSPACES);
-  const [currentWorkspace, setCurrentWorkspace] = useState(INITIAL_WORKSPACES[0]);
-  
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const [platformFilter, setPlatformFilter] = useState('All');
-  const [statusFilter, setStatusFilter] = useState('All');
-
-  // Modals state
-  const [isIdeaModalOpen, setIsIdeaModalOpen] = useState(false);
-
-  // Evaluate 30-min grace period continuously every 1 second
   useEffect(() => {
     const checkStatus = () => {
-      setTasks(prev => {
+      setAllTasks(prev => {
         const updated = processTaskStatuses(prev);
         if (JSON.stringify(updated) !== JSON.stringify(prev)) {
           return updated;
@@ -137,19 +210,48 @@ export const PlannerProvider = ({ children }) => {
         return prev;
       });
     };
-
-    checkStatus(); // Immediate check on mount
+    checkStatus();
     const interval = setInterval(checkStatus, 1000);
-
     return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('darji_tasks', JSON.stringify(tasks));
-  }, [tasks]);
+    localStorage.setItem('darji_tasks', JSON.stringify(allTasks));
+  }, [allTasks]);
 
-  // Operations
+  // 3. Ideas State
+  const [allIdeas, setAllIdeas] = useState(() => {
+    const saved = localStorage.getItem('darji_ideas');
+    if (!saved) return [];
+    try {
+      const parsed = JSON.parse(saved);
+      return parsed.map(idea => idea.workspaceId ? idea : { ...idea, workspaceId: 'ws_1' });
+    } catch (e) {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem('darji_ideas', JSON.stringify(allIdeas));
+  }, [allIdeas]);
+
+  const [notifications, setNotifications] = useState([]);
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [platformFilter, setPlatformFilter] = useState('All');
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [isIdeaModalOpen, setIsIdeaModalOpen] = useState(false);
+
+  // Filter tasks & ideas dynamically for active workspace
+  const tasks = currentWorkspace 
+    ? allTasks.filter(t => t.workspaceId === currentWorkspace.id)
+    : [];
+
+  const ideas = currentWorkspace
+    ? allIdeas.filter(idea => idea.workspaceId === currentWorkspace.id)
+    : [];
+
   const addTask = (newTask) => {
+    if (!currentWorkspace) return;
     const deadlineMs = getTaskDeadlineTimestamp(newTask.scheduledDate, newTask.scheduledTime);
     const expirationMs = deadlineMs + GRACE_PERIOD_MS;
     let initialStatus = newTask.status || 'scheduled';
@@ -165,10 +267,11 @@ export const PlannerProvider = ({ children }) => {
       description: newTask.description || '',
       assignee: newTask.assignee || 'Content Owner',
       ...newTask,
+      workspaceId: currentWorkspace.id,
       status: initialStatus
     };
 
-    setTasks(prev => [taskObj, ...prev]);
+    setAllTasks(prev => [taskObj, ...prev]);
 
     const newNotif = {
       id: 'notif_' + Date.now(),
@@ -182,7 +285,7 @@ export const PlannerProvider = ({ children }) => {
   };
 
   const updateTask = (id, updatedFields) => {
-    setTasks(prev => prev.map(t => {
+    setAllTasks(prev => prev.map(t => {
       if (t.id === id) {
         const merged = { ...t, ...updatedFields };
         if (merged.status === 'scheduled') {
@@ -199,12 +302,13 @@ export const PlannerProvider = ({ children }) => {
   };
 
   const deleteTask = (id) => {
-    setTasks(prev => prev.filter(t => t.id !== id));
+    setAllTasks(prev => prev.filter(t => t.id !== id));
   };
 
   const addIdea = (title, platform, notes) => {
-    const ideaObj = { id: 'idea_' + Date.now(), title, platform, notes };
-    setIdeas(prev => [ideaObj, ...prev]);
+    if (!currentWorkspace) return;
+    const ideaObj = { id: 'idea_' + Date.now(), title, platform, notes, workspaceId: currentWorkspace.id };
+    setAllIdeas(prev => [ideaObj, ...prev]);
   };
 
   const markAllNotificationsRead = () => {
@@ -212,7 +316,13 @@ export const PlannerProvider = ({ children }) => {
   };
 
   const updateWorkspaceName = (name, handle) => {
-    setCurrentWorkspace(prev => ({ ...prev, name, handle }));
+    if (!currentWorkspace) return;
+    setAllWorkspaces(prev => prev.map(ws => {
+      if (ws.id === currentWorkspace.id) {
+        return { ...ws, name, handle };
+      }
+      return ws;
+    }));
   };
 
   return (
@@ -220,7 +330,7 @@ export const PlannerProvider = ({ children }) => {
       tasks,
       ideas,
       notifications,
-      workspaces,
+      workspaces: activeWorkspaces,
       workspace: currentWorkspace,
       setWorkspace: setCurrentWorkspace,
       activeTab,

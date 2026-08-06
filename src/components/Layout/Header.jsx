@@ -91,13 +91,19 @@ export const Header = () => {
             <div style={{ textAlign: 'left' }}>
               <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 600 }}>Workspace</div>
               <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                {workspace.name} <ChevronDown size={14} color="var(--text-muted)" />
+                {workspace.name}
+                {workspace.ownerEmail && user?.email && workspace.ownerEmail.toLowerCase() !== user.email.toLowerCase() && (
+                  <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 500, marginLeft: '4px' }}>
+                    ({workspace.ownerEmail})
+                  </span>
+                )}
+                <ChevronDown size={14} color="var(--text-muted)" />
               </div>
             </div>
           </div>
 
           {showWorkspaceMenu && (
-            <div className="ui-card" style={{ position: 'absolute', right: 0, top: '48px', width: '230px', padding: '8px', zIndex: 1000, boxShadow: 'var(--shadow-dropdown)' }}>
+            <div className="ui-card" style={{ position: 'absolute', right: 0, top: '48px', width: '250px', padding: '8px', zIndex: 1000, boxShadow: 'var(--shadow-dropdown)' }}>
               <div style={{ padding: '6px 10px', fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', borderBottom: '1px solid var(--border-color)', marginBottom: '4px' }}>
                 ACTIVE WORKSPACE
               </div>
@@ -119,7 +125,14 @@ export const Header = () => {
                     marginBottom: '2px'
                   }}
                 >
-                  <div>{ws.name}</div>
+                  <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {ws.name}
+                    {ws.ownerEmail && user?.email && ws.ownerEmail.toLowerCase() !== user.email.toLowerCase() && (
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 500, marginLeft: '4px' }}>
+                        ({ws.ownerEmail})
+                      </span>
+                    )}
+                  </div>
                   <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 400 }}>{ws.handle}</div>
                 </button>
               ))}
