@@ -100,10 +100,11 @@ export const PlannerProvider = ({ children }) => {
         const res = await fetch(`${API_BASE}/workspaces?email=${encodeURIComponent(user.email)}`);
         const data = await res.json();
         
-        if (data.length === 0) {
-          // Initialize default workspaces in database
+        const hasOwned = data.some(ws => ws.ownerEmail.toLowerCase() === user.email.toLowerCase());
+        if (!hasOwned) {
+          // Initialize default workspaces in database for this user
           const defaults = getInitialWorkspaces(user.email);
-          const savedList = [];
+          const savedList = [...data];
           for (const ws of defaults) {
             const postRes = await fetch(`${API_BASE}/workspaces`, {
               method: 'POST',
@@ -182,8 +183,7 @@ export const PlannerProvider = ({ children }) => {
 
   // Derive planner role status
   const isPlanner = user && currentWorkspace
-    ? currentWorkspace.ownerEmail.toLowerCase() !== user.email.toLowerCase() &&
-      (currentWorkspace.teamMembers || []).some(m => m.email.toLowerCase() === user.email.toLowerCase() && m.role === 'planner')
+    ? currentWorkspace.ownerEmail.toLowerCase() !== user.email.toLowerCase()
     : false;
 
   const teamMembers = currentWorkspace ? (currentWorkspace.teamMembers || []) : [];

@@ -1,8 +1,38 @@
 import React from 'react';
+import { usePlanner } from '../../context/PlannerContext';
 import { CalendarCheck, FileEdit, Send, TrendingUp } from 'lucide-react';
 
 export const RecentActivity = () => {
-  const recentActivities = [
+  const { tasks, ideas } = usePlanner();
+
+  // Dynamically build recent activities from real tasks
+  const realActivities = tasks.slice(0, 3).map(task => {
+    let action = 'Post scheduled';
+    let color = '#f59e0b';
+    let icon = CalendarCheck;
+    
+    if (task.status === 'published') {
+      action = 'Marked as published';
+      color = '#10b981';
+      icon = Send;
+    } else if (task.status === 'missed') {
+      action = 'Post missed';
+      color = '#dc2626';
+      icon = CalendarCheck;
+    }
+
+    return {
+      id: task.id,
+      icon,
+      action,
+      title: task.title,
+      time: task.scheduledDate || 'Today',
+      color
+    };
+  });
+
+  // Fallback to static mock list if no real tasks exist
+  const recentActivities = realActivities.length > 0 ? realActivities : [
     {
       id: 1,
       icon: FileEdit,
@@ -29,10 +59,33 @@ export const RecentActivity = () => {
     }
   ];
 
+  const draftsCount = ideas.length;
+  const scheduledCount = tasks.filter(t => t.status === 'scheduled').length;
+  const publishedCount = tasks.filter(t => t.status === 'published').length;
+  const totalCount = draftsCount + scheduledCount + publishedCount;
+
   const contentProgress = [
-    { id: 1, name: 'Drafts ready', posts: '8 posts', pct: 70, color: '#3b82f6' },
-    { id: 2, name: 'Scheduled queue', posts: '12 posts', pct: 90, color: '#f59e0b' },
-    { id: 3, name: 'Published this week', posts: '10 posts', pct: 82, color: '#10b981' }
+    { 
+      id: 1, 
+      name: 'Drafts ready', 
+      posts: `${draftsCount} post${draftsCount === 1 ? '' : 's'}`, 
+      pct: totalCount > 0 ? Math.round((draftsCount / totalCount) * 100) : 0, 
+      color: '#3b82f6' 
+    },
+    { 
+      id: 2, 
+      name: 'Scheduled queue', 
+      posts: `${scheduledCount} post${scheduledCount === 1 ? '' : 's'}`, 
+      pct: totalCount > 0 ? Math.round((scheduledCount / totalCount) * 100) : 0, 
+      color: '#f59e0b' 
+    },
+    { 
+      id: 3, 
+      name: 'Published this week', 
+      posts: `${publishedCount} post${publishedCount === 1 ? '' : 's'}`, 
+      pct: totalCount > 0 ? Math.round((publishedCount / totalCount) * 100) : 0, 
+      color: '#10b981' 
+    }
   ];
 
   return (
