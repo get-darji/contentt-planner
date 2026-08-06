@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { usePlanner } from '../../context/PlannerContext';
 import { useAuth } from '../../context/AuthContext';
-import { X, Calendar, AlertTriangle } from 'lucide-react';
+import { X, Calendar, AlertTriangle, Link as LinkIcon } from 'lucide-react';
 
-export const ContentModal = ({ isOpen, onClose, initialDate }) => {
-  const { addTask } = usePlanner();
+export const ContentModal = ({ isOpen, onClose, initialDate, editingTask }) => {
+  const { addTask, updateTask, isPlanner } = usePlanner();
   const { user } = useAuth();
 
   const todayStr = new Date().toISOString().split('T')[0];
@@ -16,22 +16,36 @@ export const ContentModal = ({ isOpen, onClose, initialDate }) => {
     scheduledDate: initialDate || todayStr,
     scheduledTime: '12:00',
     description: '',
-    assignee: assigneeName
+    assignee: assigneeName,
+    contentLink: ''
   });
 
   const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
-    setFormData({
-      title: '',
-      platform: 'Instagram',
-      scheduledDate: initialDate || todayStr,
-      scheduledTime: '12:00',
-      description: '',
-      assignee: assigneeName
-    });
+    if (editingTask) {
+      setFormData({
+        title: editingTask.title || '',
+        platform: editingTask.platform || 'Instagram',
+        scheduledDate: editingTask.scheduledDate || todayStr,
+        scheduledTime: editingTask.scheduledTime || '12:00',
+        description: editingTask.description || '',
+        assignee: editingTask.assignee || assigneeName,
+        contentLink: editingTask.contentLink || ''
+      });
+    } else {
+      setFormData({
+        title: '',
+        platform: 'Instagram',
+        scheduledDate: initialDate || todayStr,
+        scheduledTime: '12:00',
+        description: '',
+        assignee: assigneeName,
+        contentLink: ''
+      });
+    }
     setErrorMsg('');
-  }, [assigneeName, initialDate, isOpen]);
+  }, [assigneeName, initialDate, isOpen, editingTask, todayStr]);
 
   if (!isOpen) return null;
 
@@ -44,19 +58,35 @@ export const ContentModal = ({ isOpen, onClose, initialDate }) => {
       return;
     }
 
-    if (formData.scheduledDate < todayStr) {
+    const isDateChanged = editingTask ? formData.scheduledDate !== editingTask.scheduledDate : true;
+
+    // Enforce date validation rules for Planner: cannot schedule in the past.
+    // If they are editing an existing past post, they are allowed to edit it, but NOT schedule it in the past (meaning they cannot change the date to a new past date).
+    if (isPlanner && formData.scheduledDate < todayStr && isDateChanged) {
       setErrorMsg('Cannot schedule content on past dates. Please select today or a future date.');
       return;
     }
 
-    // Always create as 'scheduled'
-    addTask({
-      ...formData,
-      status: 'scheduled'
-    });
+    if (editingTask) {
+      updateTask(editingTask.id, {
+        title: formData.title,
+        platform: formData.platform,
+        scheduledDate: formData.scheduledDate,
+        scheduledTime: formData.scheduledTime,
+        description: formData.description,
+        contentLink: formData.contentLink
+      });
+    } else {
+      addTask({
+        ...formData,
+        status: 'scheduled'
+      });
+    }
 
     onClose();
   };
+
+  const minDate = isPlanner ? (editingTask && editingTask.scheduledDate < todayStr ? editingTask.scheduledDate : todayStr) : undefined;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -66,10 +96,10 @@ export const ContentModal = ({ isOpen, onClose, initialDate }) => {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border-color)', paddingBottom: '16px', marginBottom: '20px' }}>
           <div>
             <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>
-              Schedule New Content
+              {editingTask ? 'Edit Scheduled Post' : 'Schedule New Content'}
             </h3>
             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-              Set publish date and platform for this post.
+              {editingTask ? 'Update post schedule details and content.' : 'Set publish date and platform for this post.'}
             </p>
           </div>
           <button className="btn btn-secondary btn-icon" onClick={onClose}>
@@ -123,7 +153,7 @@ export const ContentModal = ({ isOpen, onClose, initialDate }) => {
               <input 
                 type="date"
                 className="form-input"
-                min={todayStr}
+                min={minDate}
                 value={formData.scheduledDate}
                 onChange={(e) => setFormData({ ...formData, scheduledDate: e.target.value })}
                 required
@@ -138,6 +168,22 @@ export const ContentModal = ({ isOpen, onClose, initialDate }) => {
                 value={formData.scheduledTime}
                 onChange={(e) => setFormData({ ...formData, scheduledTime: e.target.value })}
               />
+            </div>
+          </div>
+
+          {/* Content Link */}
+          <div className="form-group">
+            <label className="form-label">Content Link / URL</label>
+            <div style={{ position: 'relative' }}>
+              <input
+                type="url"
+                className="form-input"
+                placeholder="e.g. https://instagram.com/p/... or https://youtube.com/..."
+                value={formData.contentLink || ''}
+                onChange={(e) => setFormData({ ...formData, contentLink: e.target.value })}
+                style={{ paddingLeft: '38px' }}
+              />
+              <LinkIcon size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
             </div>
           </div>
 
@@ -164,13 +210,13 @@ export const ContentModal = ({ isOpen, onClose, initialDate }) => {
             />
           </div>
 
-          {/* Single Schedule CTA Button */}
+          {/* Schedule CTA Buttons */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '10px', marginTop: '24px', paddingTop: '16px', borderTop: '1px solid var(--border-color)' }}>
             <button type="button" className="btn btn-secondary" onClick={onClose}>
               Cancel
             </button>
             <button type="submit" className="btn btn-orange-primary" style={{ padding: '10px 24px', fontSize: '0.95rem' }}>
-              <Calendar size={16} /> Schedule Post
+              <Calendar size={16} /> {editingTask ? 'Save Changes' : 'Schedule Post'}
             </button>
           </div>
 

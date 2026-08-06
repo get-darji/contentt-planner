@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 
 export const ContentDetailView = ({ task, onClose }) => {
-  const { updateTask, deleteTask } = usePlanner();
+  const { updateTask, deleteTask, isPlanner } = usePlanner();
 
   const [contentLink, setContentLink] = useState(task?.contentLink || '');
   const [errorMsg, setErrorMsg] = useState('');
@@ -34,6 +34,7 @@ export const ContentDetailView = ({ task, onClose }) => {
 
   const handlePublish = (e) => {
     e.preventDefault();
+    if (isPlanner) return;
     setErrorMsg('');
 
     if (!contentLink.trim()) {
@@ -52,7 +53,37 @@ export const ContentDetailView = ({ task, onClose }) => {
     }, 1500);
   };
 
+  const handlePlannerSchedule = (e) => {
+    e.preventDefault();
+    setErrorMsg('');
+    setSuccessMsg('');
+
+    if (!contentLink.trim()) {
+      setErrorMsg('Please paste the Content Link to schedule.');
+      return;
+    }
+
+    // Set date to today, time to current hour + 2 to avoid expiring
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
+    now.setHours(now.getHours() + 2);
+    const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    updateTask(task.id, {
+      status: 'scheduled',
+      contentLink: contentLink.trim(),
+      scheduledDate: todayStr,
+      scheduledTime: timeStr
+    });
+
+    setSuccessMsg('Post scheduled successfully with link!');
+    setTimeout(() => {
+      onClose();
+    }, 1500);
+  };
+
   const handleDelete = () => {
+    if (isPlanner) return;
     if (window.confirm('Are you sure you want to delete this content item?')) {
       deleteTask(task.id);
       onClose();
@@ -129,38 +160,71 @@ export const ContentDetailView = ({ task, onClose }) => {
           )}
         </div>
 
-        {/* Publish Action & Content Link Form */}
+        {/* Publish Action & Content Link Form (or Planner quick link schedule) */}
         {task.status !== 'published' ? (
-          <div className="ui-card" style={{ padding: '20px', marginBottom: '20px', borderLeft: '4px solid #10b981' }}>
-            <h4 style={{ fontSize: '1rem', fontWeight: 800, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px', color: '#059669' }}>
-              <CheckCircle2 size={18} /> Publish This Post
-            </h4>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
-              Paste your live post URL below to publish and complete this scheduled task.
-            </p>
+          !isPlanner ? (
+            <div className="ui-card" style={{ padding: '20px', marginBottom: '20px', borderLeft: '4px solid #10b981' }}>
+              <h4 style={{ fontSize: '1rem', fontWeight: 800, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px', color: '#059669' }}>
+                <CheckCircle2 size={18} /> Publish This Post
+              </h4>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
+                Paste your live post URL below to publish and complete this scheduled task.
+              </p>
 
-            <form onSubmit={handlePublish}>
-              <div className="form-group" style={{ marginBottom: '16px' }}>
-                <label className="form-label">Live Content URL *</label>
-                <div style={{ position: 'relative' }}>
-                  <input 
-                    type="url"
-                    className="form-input"
-                    placeholder="https://instagram.com/p/... or https://youtube.com/..."
-                    value={contentLink}
-                    onChange={(e) => setContentLink(e.target.value)}
-                    style={{ paddingLeft: '38px' }}
-                    required
-                  />
-                  <LinkIcon size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+              <form onSubmit={handlePublish}>
+                <div className="form-group" style={{ marginBottom: '16px' }}>
+                  <label className="form-label">Live Content URL *</label>
+                  <div style={{ position: 'relative' }}>
+                    <input 
+                      type="url"
+                      className="form-input"
+                      placeholder="https://instagram.com/p/... or https://youtube.com/..."
+                      value={contentLink}
+                      onChange={(e) => setContentLink(e.target.value)}
+                      style={{ paddingLeft: '38px' }}
+                      required
+                    />
+                    <LinkIcon size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+                  </div>
                 </div>
-              </div>
 
-              <button type="submit" className="btn" style={{ width: '100%', background: '#10b981', color: '#ffffff', fontWeight: 700, padding: '12px', fontSize: '0.95rem' }}>
-                <Check size={16} /> Publish Content Now
-              </button>
-            </form>
-          </div>
+                <button type="submit" className="btn" style={{ width: '100%', background: '#10b981', color: '#ffffff', fontWeight: 700, padding: '12px', fontSize: '0.95rem' }}>
+                  <Check size={16} /> Publish Content Now
+                </button>
+              </form>
+            </div>
+          ) : (
+            <div className="ui-card" style={{ padding: '20px', marginBottom: '20px', borderLeft: '4px solid var(--orange-primary)' }}>
+              <h4 style={{ fontSize: '1rem', fontWeight: 800, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--orange-primary)' }}>
+                <Calendar size={18} /> Directly Schedule with Link
+              </h4>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
+                Paste the content URL below to make the post status "scheduled". The date will automatically be set to today so it is not in the past.
+              </p>
+
+              <form onSubmit={handlePlannerSchedule}>
+                <div className="form-group" style={{ marginBottom: '16px' }}>
+                  <label className="form-label">Content URL *</label>
+                  <div style={{ position: 'relative' }}>
+                    <input 
+                      type="url"
+                      className="form-input"
+                      placeholder="https://instagram.com/p/... or https://youtube.com/..."
+                      value={contentLink}
+                      onChange={(e) => setContentLink(e.target.value)}
+                      style={{ paddingLeft: '38px' }}
+                      required
+                    />
+                    <LinkIcon size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+                  </div>
+                </div>
+
+                <button type="submit" className="btn btn-orange-primary" style={{ width: '100%', fontWeight: 700, padding: '12px', fontSize: '0.95rem' }}>
+                  <Calendar size={16} /> Make Status "Scheduled"
+                </button>
+              </form>
+            </div>
+          )
         ) : (
           <div className="ui-card" style={{ padding: '16px', marginBottom: '20px', background: '#ecfdf5', borderColor: '#6ee7b7' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -187,10 +251,12 @@ export const ContentDetailView = ({ task, onClose }) => {
         )}
 
         {/* Footer */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
-          <button className="btn btn-secondary" onClick={handleDelete} style={{ color: '#dc2626' }}>
-            <Trash2 size={16} /> Delete Post
-          </button>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: isPlanner ? 'flex-end' : 'space-between', borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
+          {!isPlanner && (
+            <button className="btn btn-secondary" onClick={handleDelete} style={{ color: '#dc2626' }}>
+              <Trash2 size={16} /> Delete Post
+            </button>
+          )}
 
           <button className="btn btn-secondary" onClick={onClose}>
             Close

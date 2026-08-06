@@ -4,7 +4,8 @@ import { getPlatformIcon } from '../Calendar/ContentTile';
 import { Search, Filter, ExternalLink, Trash2, Edit3, Plus, CheckCircle2 } from 'lucide-react';
 
 export const ContentView = ({ onOpenAddModal, onEditTask }) => {
-  const { tasks, deleteTask } = usePlanner();
+  const { tasks, deleteTask, isPlanner } = usePlanner();
+  const todayStr = new Date().toISOString().split('T')[0];
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPlatform, setSelectedPlatform] = useState('All');
   const [selectedStatus, setSelectedStatus] = useState('All');
@@ -118,12 +119,20 @@ export const ContentView = ({ onOpenAddModal, onEditTask }) => {
                 </td>
                 <td style={{ padding: '16px 20px' }}>
                   <div style={{ display: 'flex', gap: '8px' }}>
-                    <button className="btn btn-secondary btn-icon" onClick={() => onEditTask(task)} title="Edit Task">
-                      <Edit3 size={14} />
-                    </button>
-                    <button className="btn btn-secondary btn-icon" onClick={() => deleteTask(task.id)} style={{ color: '#dc2626' }} title="Delete Task">
-                      <Trash2 size={14} />
-                    </button>
+                    {(!isPlanner || task.scheduledDate >= todayStr || task.status === 'scheduled') ? (
+                      <button className="btn btn-secondary btn-icon" onClick={() => onEditTask(task)} title="Edit Task">
+                        <Edit3 size={14} />
+                      </button>
+                    ) : (
+                      <button className="btn btn-secondary btn-icon" style={{ cursor: 'not-allowed', opacity: 0.4 }} title="Cannot edit past non-scheduled posts" disabled>
+                        <Edit3 size={14} />
+                      </button>
+                    )}
+                    {!isPlanner && (
+                      <button className="btn btn-secondary btn-icon" onClick={() => deleteTask(task.id)} style={{ color: '#dc2626' }} title="Delete Task">
+                        <Trash2 size={14} />
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>

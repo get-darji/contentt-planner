@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 
 const PlannerContext = createContext();
 
@@ -64,6 +65,40 @@ const INITIAL_WORKSPACES = [
 ];
 
 export const PlannerProvider = ({ children }) => {
+  const { user } = useAuth();
+
+  const [teamMembers, setTeamMembers] = useState(() => {
+    const saved = localStorage.getItem('darji_team_members');
+    if (saved) return JSON.parse(saved);
+    return [
+      { email: 'planner@example.com', name: 'Sam Planner', role: 'planner', addedAt: new Date().toISOString().split('T')[0] }
+    ];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('darji_team_members', JSON.stringify(teamMembers));
+  }, [teamMembers]);
+
+  const isPlanner = user ? teamMembers.some(member => member.email.toLowerCase() === user.email.toLowerCase()) : false;
+
+  const addTeamMember = (email, name) => {
+    const trimmedEmail = email.trim().toLowerCase();
+    if (teamMembers.some(m => m.email.toLowerCase() === trimmedEmail)) {
+      throw new Error('This email is already added to the team.');
+    }
+    const newMember = {
+      email: email.trim(),
+      name: name.trim() || email.split('@')[0],
+      role: 'planner',
+      addedAt: new Date().toISOString().split('T')[0]
+    };
+    setTeamMembers(prev => [...prev, newMember]);
+  };
+
+  const removeTeamMember = (email) => {
+    setTeamMembers(prev => prev.filter(m => m.email.toLowerCase() !== email.toLowerCase()));
+  };
+
   const [tasks, setTasks] = useState(() => {
     const saved = localStorage.getItem('darji_tasks');
     if (!saved) return [];
@@ -201,7 +236,11 @@ export const PlannerProvider = ({ children }) => {
       markAllNotificationsRead,
       updateWorkspaceName,
       isIdeaModalOpen,
-      setIsIdeaModalOpen
+      setIsIdeaModalOpen,
+      teamMembers,
+      isPlanner,
+      addTeamMember,
+      removeTeamMember
     }}>
       {children}
     </PlannerContext.Provider>

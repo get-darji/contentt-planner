@@ -4,7 +4,10 @@ import { getPlatformIcon } from './ContentTile';
 import { X, Plus, Calendar, Clock, ChevronRight, User } from 'lucide-react';
 
 export const DatePostsListModal = ({ isOpen, onClose, dateString, onSelectPost, onScheduleNew }) => {
-  const { tasks } = usePlanner();
+  const { tasks, isPlanner } = usePlanner();
+  const todayStr = new Date().toISOString().split('T')[0];
+  const isPast = dateString < todayStr;
+  const showScheduleBtn = !isPlanner || !isPast;
 
   if (!isOpen || !dateString) return null;
 
@@ -76,18 +79,20 @@ export const DatePostsListModal = ({ isOpen, onClose, dateString, onSelectPost, 
         </div>
 
         {/* Bottom CTA to schedule another post for this date */}
-        <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '16px', display: 'flex', alignItems: 'center', justifyContent: showScheduleBtn ? 'space-between' : 'flex-end' }}>
           <button className="btn btn-secondary" onClick={onClose}>
             Close
           </button>
           
-          <button 
-            className="btn btn-orange-primary" 
-            onClick={() => onScheduleNew(dateString)}
-            style={{ fontSize: '0.85rem' }}
-          >
-            <Plus size={16} /> Schedule Another Post
-          </button>
+          {showScheduleBtn && (
+            <button 
+              className="btn btn-orange-primary" 
+              onClick={() => onScheduleNew(dateString)}
+              style={{ fontSize: '0.85rem' }}
+            >
+              <Plus size={16} /> Schedule Another Post
+            </button>
+          )}
         </div>
 
       </div>

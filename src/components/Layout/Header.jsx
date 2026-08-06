@@ -23,7 +23,8 @@ export const Header = () => {
     notifications, 
     markAllNotificationsRead, 
     tasks,
-    setActiveTab
+    setActiveTab,
+    isPlanner
   } = usePlanner();
 
   const { user, logout } = useAuth();
@@ -290,6 +291,9 @@ export const Header = () => {
               <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '8px', marginBottom: '8px' }}>
                 <div style={{ fontSize: '0.85rem', fontWeight: 800 }}>{user?.name || 'Google user'}</div>
                 <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{user?.email || ''}</div>
+                <div style={{ display: 'inline-block', fontSize: '0.7rem', fontWeight: 700, color: isPlanner ? 'var(--orange-primary)' : 'var(--status-published-text)', background: isPlanner ? 'var(--orange-light)' : 'var(--status-published-bg)', padding: '2px 8px', borderRadius: '10px', marginTop: '6px', border: isPlanner ? '1px solid var(--orange-border)' : '1px solid var(--status-published-border)' }}>
+                  Role: {isPlanner ? 'Planner' : 'Owner'}
+                </div>
               </div>
               <button 
                 onClick={() => { setActiveTab('settings'); setShowProfileMenu(false); }}
