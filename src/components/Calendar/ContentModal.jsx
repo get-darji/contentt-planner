@@ -95,7 +95,7 @@ export const ContentModal = ({ isOpen, onClose, initialDate, editingTask }) => {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-        
+
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border-color)', paddingBottom: '16px', marginBottom: '20px' }}>
           <div>
@@ -118,11 +118,11 @@ export const ContentModal = ({ isOpen, onClose, initialDate, editingTask }) => {
         )}
 
         <form onSubmit={handleSubmit}>
-          
+
           {/* Title */}
           <div className="form-group">
             <label className="form-label">Content Title *</label>
-            <input 
+            <input
               type="text"
               className="form-input"
               placeholder="e.g. AI Product Launch Reel"
@@ -137,7 +137,7 @@ export const ContentModal = ({ isOpen, onClose, initialDate, editingTask }) => {
           <div className="form-grid two-field-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
             <div className="form-group">
               <label className="form-label">Social Platform</label>
-              <select 
+              <select
                 className="form-select"
                 value={formData.platform}
                 onChange={(e) => setFormData({ ...formData, platform: e.target.value })}
@@ -146,14 +146,17 @@ export const ContentModal = ({ isOpen, onClose, initialDate, editingTask }) => {
                 <option value="YouTube">YouTube</option>
                 <option value="LinkedIn">LinkedIn</option>
                 <option value="Twitter">X / Twitter</option>
-                <option value="TikTok">TikTok</option>
+                <option value="Medium">Medium</option>
+                <option value="Reddit">Reddit</option>
+                <option value="pintrest">Pintrest</option>
+                <option value="Thread">Thread</option>
                 <option value="Facebook">Facebook</option>
               </select>
             </div>
 
             <div className="form-group">
               <label className="form-label">Post Status</label>
-              <select 
+              <select
                 className="form-select"
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
@@ -169,7 +172,7 @@ export const ContentModal = ({ isOpen, onClose, initialDate, editingTask }) => {
           <div className="form-grid two-field-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
             <div className="form-group">
               <label className="form-label">Scheduled Date *</label>
-              <input 
+              <input
                 type="date"
                 className="form-input"
                 min={minDate}
@@ -181,7 +184,7 @@ export const ContentModal = ({ isOpen, onClose, initialDate, editingTask }) => {
 
             <div className="form-group">
               <label className="form-label">Scheduled Time</label>
-              <input 
+              <input
                 type="time"
                 className="form-input"
                 value={formData.scheduledTime}
@@ -220,7 +223,7 @@ export const ContentModal = ({ isOpen, onClose, initialDate, editingTask }) => {
           {/* Description */}
           <div className="form-group">
             <label className="form-label">Description / Instructions</label>
-            <textarea 
+            <textarea
               rows={3}
               className="form-textarea"
               placeholder="Add captions, hashtags, or video notes..."

@@ -12,7 +12,7 @@ export const ContentView = ({ onOpenAddModal, onEditTask }) => {
 
   const filteredTasks = tasks.filter(t => {
     const matchesSearch = t.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          t.assignee.toLowerCase().includes(searchTerm.toLowerCase());
+      t.assignee.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesPlatform = selectedPlatform === 'All' || t.platform.toLowerCase() === selectedPlatform.toLowerCase();
     const matchesStatus = selectedStatus === 'All' || t.status.toLowerCase() === selectedStatus.toLowerCase();
     return matchesSearch && matchesPlatform && matchesStatus;
@@ -20,7 +20,7 @@ export const ContentView = ({ onOpenAddModal, onEditTask }) => {
 
   return (
     <div className="page-container content-page" style={{ padding: '0 32px 48px 32px', maxWidth: '1600px', margin: '0 auto' }}>
-      
+
       {/* Header & Controls */}
       <div className="page-header-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
@@ -36,7 +36,7 @@ export const ContentView = ({ onOpenAddModal, onEditTask }) => {
       {/* Filter Bar */}
       <div className="ui-card filter-bar" style={{ padding: '16px 20px', marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
         <div className="filter-search" style={{ position: 'relative', width: '280px' }}>
-          <input 
+          <input
             type="text"
             className="form-input"
             placeholder="Search content title..."
@@ -48,7 +48,7 @@ export const ContentView = ({ onOpenAddModal, onEditTask }) => {
         </div>
 
         <div className="filter-selects" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <select 
+          <select
             className="form-select"
             value={selectedPlatform}
             onChange={(e) => setSelectedPlatform(e.target.value)}
@@ -59,11 +59,14 @@ export const ContentView = ({ onOpenAddModal, onEditTask }) => {
             <option value="Instagram">Instagram</option>
             <option value="LinkedIn">LinkedIn</option>
             <option value="Twitter">X / Twitter</option>
-            <option value="TikTok">TikTok</option>
+            <option value="Medium">Medium</option>
+            <option value="Reddit">Reddit</option>
+            <option value="Pintrest">Pintrest</option>
+            <option value="Thread">Thread</option>
             <option value="Facebook">Facebook</option>
           </select>
 
-          <select 
+          <select
             className="form-select"
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}

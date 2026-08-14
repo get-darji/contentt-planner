@@ -4,11 +4,11 @@ import { ContentTile } from './ContentTile';
 import { ContentModal } from './ContentModal';
 import { ContentDetailView } from './ContentDetailView';
 import { DatePostsListModal } from './DatePostsListModal';
-import { 
-  ChevronLeft, 
-  ChevronRight, 
-  Plus, 
-  Filter, 
+import {
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  Filter,
   Calendar as CalendarIcon,
   AlertTriangle
 } from 'lucide-react';
@@ -26,7 +26,7 @@ export const CalendarView = () => {
   const todayStr = new Date().toISOString().split('T')[0];
 
   const monthNames = [
-    "January", "February", "March", "April", "May", "June", 
+    "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
   ];
   const yearsList = [2024, 2025, 2026, 2027, 2028, 2029, 2030];
@@ -110,7 +110,7 @@ export const CalendarView = () => {
 
   return (
     <div className="page-container calendar-page" style={{ maxWidth: '1400px', margin: '24px auto', padding: '0 24px' }}>
-      
+
       {pastDateWarning && (
         <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', color: '#dc2626', padding: '10px 14px', borderRadius: '10px', fontSize: '0.85rem', fontWeight: 700, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <AlertTriangle size={16} /> {pastDateWarning}
@@ -119,14 +119,14 @@ export const CalendarView = () => {
 
       {/* Top Filter & Toolbar Bar */}
       <div className="ui-card calendar-toolbar" style={{ padding: '16px 24px', marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
-        
+
         <div className="calendar-controls" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <button className="btn btn-secondary btn-icon" onClick={handlePrevMonth} title="Previous Month">
             <ChevronLeft size={18} />
           </button>
-          
+
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--bg-main)', padding: '4px 10px', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
-            <select 
+            <select
               value={month}
               onChange={handleMonthSelect}
               style={{ background: 'transparent', border: 0, fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)', outline: 'none', cursor: 'pointer' }}
@@ -136,7 +136,7 @@ export const CalendarView = () => {
               ))}
             </select>
 
-            <select 
+            <select
               value={year}
               onChange={handleYearSelect}
               style={{ background: 'transparent', border: 0, fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)', outline: 'none', cursor: 'pointer' }}
@@ -158,13 +158,13 @@ export const CalendarView = () => {
 
         {/* Platform & Status Filters */}
         <div className="filter-controls" style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-          
+
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--bg-main)', padding: '4px', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
             <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', padding: '0 8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
               <Filter size={12} /> Platform:
             </span>
-            {['All', 'YouTube', 'Instagram', 'Twitter', 'LinkedIn', 'TikTok', 'Facebook'].map(p => (
-              <button 
+            {['All', 'YouTube', 'Instagram', 'Twitter', 'LinkedIn', 'Medium', 'Reddit', 'pintrest', 'Thread', 'Facebook'].map(p => (
+              <button
                 key={p}
                 onClick={() => setPlatformFilter(p)}
                 style={{
@@ -187,7 +187,7 @@ export const CalendarView = () => {
             <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', padding: '0 8px' }}>
               Status:
             </span>
-            <button 
+            <button
               onClick={() => setStatusFilter('All')}
               style={{
                 padding: '4px 10px',
@@ -202,21 +202,21 @@ export const CalendarView = () => {
             >
               All
             </button>
-            <button 
+            <button
               onClick={() => setStatusFilter('scheduled')}
               className={`status-pill ${statusFilter === 'scheduled' ? 'scheduled' : ''}`}
               style={{ opacity: statusFilter === 'scheduled' || statusFilter === 'All' ? 1 : 0.4, cursor: 'pointer' }}
             >
               🟨 Scheduled
             </button>
-            <button 
+            <button
               onClick={() => setStatusFilter('missed')}
               className={`status-pill ${statusFilter === 'missed' ? 'missed' : ''}`}
               style={{ opacity: statusFilter === 'missed' || statusFilter === 'All' ? 1 : 0.4, cursor: 'pointer' }}
             >
               🟥 Missed
             </button>
-            <button 
+            <button
               onClick={() => setStatusFilter('published')}
               className={`status-pill ${statusFilter === 'published' ? 'published' : ''}`}
               style={{ opacity: statusFilter === 'published' || statusFilter === 'All' ? 1 : 0.4, cursor: 'pointer' }}
@@ -243,15 +243,15 @@ export const CalendarView = () => {
         {calendarGrid.map((cell, idx) => {
           if (!cell.isCurrentMonth) {
             return (
-              <div 
-                key={`empty_${idx}`} 
-                style={{ 
-                  minHeight: '140px', 
-                  background: '#fcfcf9', 
-                  borderRadius: 'var(--radius-md)', 
+              <div
+                key={`empty_${idx}`}
+                style={{
+                  minHeight: '140px',
+                  background: '#fcfcf9',
+                  borderRadius: 'var(--radius-md)',
                   border: '1px solid transparent',
                   opacity: 0.25
-                }} 
+                }}
               />
             );
           }
@@ -259,7 +259,7 @@ export const CalendarView = () => {
           const dayTasks = filteredTasks.filter(t => t.scheduledDate === cell.dateString);
 
           return (
-            <div 
+            <div
               key={cell.dateString}
               className="ui-card"
               onClick={() => handleDayClick(cell)}
@@ -279,9 +279,9 @@ export const CalendarView = () => {
               <div>
                 {/* Tile Header: Date Number & Count */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <span style={{ 
-                    fontWeight: 800, 
-                    fontSize: '0.9rem', 
+                  <span style={{
+                    fontWeight: 800,
+                    fontSize: '0.9rem',
                     color: cell.isToday ? 'var(--orange-primary)' : 'var(--text-main)',
                     background: cell.isToday ? '#fff' : 'transparent',
                     padding: cell.isToday ? '2px 8px' : 0,
@@ -300,7 +300,7 @@ export const CalendarView = () => {
                 {/* Day Tasks Preview */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   {dayTasks.map(task => (
-                    <ContentTile 
+                    <ContentTile
                       key={task.id}
                       task={task}
                       onClick={(t) => { setSelectedTaskForDetails(t); }}
@@ -310,7 +310,7 @@ export const CalendarView = () => {
               </div>
 
               {!cell.isPast && dayTasks.length === 0 && (
-                <div 
+                <div
                   style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center', padding: '12px 0', opacity: 0.5 }}
                 >
                   + Schedule Post
@@ -322,7 +322,7 @@ export const CalendarView = () => {
       </div>
 
       {/* Date Posts List Modal */}
-      <DatePostsListModal 
+      <DatePostsListModal
         isOpen={Boolean(selectedDateForList)}
         onClose={() => setSelectedDateForList(null)}
         dateString={selectedDateForList}
@@ -339,14 +339,14 @@ export const CalendarView = () => {
 
       {/* Task Details / Publish Modal */}
       {selectedTaskForDetails && (
-        <ContentDetailView 
+        <ContentDetailView
           task={selectedTaskForDetails}
           onClose={() => setSelectedTaskForDetails(null)}
         />
       )}
 
       {/* New Schedule Modal */}
-      <ContentModal 
+      <ContentModal
         isOpen={isNewModalOpen}
         onClose={() => setIsNewModalOpen(false)}
         initialDate={selectedDateForNew}

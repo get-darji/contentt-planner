@@ -22,7 +22,7 @@ export const QuickIdeaModal = () => {
   return (
     <div className="modal-overlay" onClick={() => setIsIdeaModalOpen(false)}>
       <div className="modal-container" style={{ maxWidth: '460px' }} onClick={(e) => e.stopPropagation()}>
-        
+
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div style={{ background: '#fff0db', padding: '6px', borderRadius: '8px', color: 'var(--orange-primary)' }}>
@@ -36,7 +36,7 @@ export const QuickIdeaModal = () => {
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label className="form-label">Idea Title *</label>
-            <input 
+            <input
               type="text"
               className="form-input"
               placeholder="e.g. 5 AI tools every creator needs"
@@ -49,7 +49,7 @@ export const QuickIdeaModal = () => {
 
           <div className="form-group">
             <label className="form-label">Target Platform</label>
-            <select 
+            <select
               className="form-select"
               value={platform}
               onChange={(e) => setPlatform(e.target.value)}
@@ -58,14 +58,17 @@ export const QuickIdeaModal = () => {
               <option value="YouTube">YouTube</option>
               <option value="LinkedIn">LinkedIn</option>
               <option value="Twitter">X / Twitter</option>
-              <option value="TikTok">TikTok</option>
+              <option value="Medium">Medium</option>
+              <option value="Reddit">Reddit</option>
+              <option value="pintrest">Pintrest</option>
+              <option value="Thread">Thread</option>
               <option value="Facebook">Facebook</option>
             </select>
           </div>
 
           <div className="form-group">
             <label className="form-label">Key Outline / Notes</label>
-            <textarea 
+            <textarea
               rows={3}
               className="form-textarea"
               placeholder="Add quick bullet points or inspiration links..."
