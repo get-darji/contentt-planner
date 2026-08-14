@@ -63,13 +63,6 @@ export const ContentModal = ({ isOpen, onClose, initialDate, editingTask }) => {
 
     const isDateChanged = editingTask ? formData.scheduledDate !== editingTask.scheduledDate : true;
 
-    // Enforce date validation rules for Planner: cannot schedule in the past.
-    // If they are editing an existing past post, they are allowed to edit it, but NOT schedule it in the past (meaning they cannot change the date to a new past date).
-    if (isPlanner && formData.scheduledDate < todayStr && isDateChanged) {
-      setErrorMsg('Cannot schedule content on past dates. Please select today or a future date.');
-      return;
-    }
-
     if (editingTask) {
       updateTask(editingTask.id, {
         title: formData.title,
@@ -90,7 +83,7 @@ export const ContentModal = ({ isOpen, onClose, initialDate, editingTask }) => {
     onClose();
   };
 
-  const minDate = isPlanner ? (editingTask && editingTask.scheduledDate < todayStr ? editingTask.scheduledDate : todayStr) : undefined;
+  const minDate = undefined;
 
   return (
     <div className="modal-overlay" onClick={onClose}>

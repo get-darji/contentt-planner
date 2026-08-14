@@ -122,15 +122,9 @@ export const ContentView = ({ onOpenAddModal, onEditTask }) => {
                 </td>
                 <td style={{ padding: '16px 20px' }}>
                   <div style={{ display: 'flex', gap: '8px' }}>
-                    {(!isPlanner || task.scheduledDate >= todayStr || task.status === 'scheduled') ? (
-                      <button className="btn btn-secondary btn-icon" onClick={() => onEditTask(task)} title="Edit Task">
-                        <Edit3 size={14} />
-                      </button>
-                    ) : (
-                      <button className="btn btn-secondary btn-icon" style={{ cursor: 'not-allowed', opacity: 0.4 }} title="Cannot edit past non-scheduled posts" disabled>
-                        <Edit3 size={14} />
-                      </button>
-                    )}
+                    <button className="btn btn-secondary btn-icon" onClick={() => onEditTask(task)} title="Edit Task">
+                      <Edit3 size={14} />
+                    </button>
                     {!isPlanner && (
                       <button className="btn btn-secondary btn-icon" onClick={() => deleteTask(task.id)} style={{ color: '#dc2626' }} title="Delete Task">
                         <Trash2 size={14} />

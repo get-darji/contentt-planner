@@ -12,10 +12,11 @@ import {
   Trash2,
   Share2,
   Link as LinkIcon,
-  Check
+  Check,
+  Edit3
 } from 'lucide-react';
 
-export const ContentDetailView = ({ task, onClose }) => {
+export const ContentDetailView = ({ task, onClose, onEdit }) => {
   const { updateTask, deleteTask, isPlanner } = usePlanner();
 
   const [contentLink, setContentLink] = useState(task?.contentLink || '');
@@ -260,12 +261,17 @@ export const ContentDetailView = ({ task, onClose }) => {
         )}
 
         {/* Footer */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: isPlanner ? 'flex-end' : 'space-between', borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
-          {!isPlanner && (
-            <button className="btn btn-secondary" onClick={handleDelete} style={{ color: '#dc2626' }}>
-              <Trash2 size={16} /> Delete Post
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button className="btn btn-secondary" onClick={() => onEdit(task)}>
+              <Edit3 size={16} /> Edit Post
             </button>
-          )}
+            {!isPlanner && (
+              <button className="btn btn-secondary" onClick={handleDelete} style={{ color: '#dc2626' }}>
+                <Trash2 size={16} /> Delete Post
+              </button>
+            )}
+          </div>
 
           <button className="btn btn-secondary" onClick={onClose}>
             Close

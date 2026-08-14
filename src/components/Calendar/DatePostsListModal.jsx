@@ -7,7 +7,7 @@ export const DatePostsListModal = ({ isOpen, onClose, dateString, onSelectPost, 
   const { tasks, isPlanner } = usePlanner();
   const todayStr = new Date().toISOString().split('T')[0];
   const isPast = dateString < todayStr;
-  const showScheduleBtn = !isPlanner || !isPast;
+  const showScheduleBtn = true;
 
   if (!isOpen || !dateString) return null;
 

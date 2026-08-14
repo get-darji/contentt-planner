@@ -22,6 +22,7 @@ export const CalendarView = () => {
   const [isNewModalOpen, setIsNewModalOpen] = useState(false);
   const [selectedDateForNew, setSelectedDateForNew] = useState('');
   const [pastDateWarning, setPastDateWarning] = useState('');
+  const [editingTask, setEditingTask] = useState(null);
 
   const todayStr = new Date().toISOString().split('T')[0];
 
@@ -88,22 +89,11 @@ export const CalendarView = () => {
 
     const dayTasks = filteredTasks.filter(t => t.scheduledDate === cell.dateString);
 
-    if (cell.isPast) {
-      if (dayTasks.length > 0) {
-        setSelectedDateForList(cell.dateString);
-      } else {
-        setPastDateWarning(`Cannot schedule content on past date (${cell.dateString}). Please select today or a future date.`);
-        setTimeout(() => setPastDateWarning(''), 4000);
-      }
-      return;
-    }
-
-    setPastDateWarning('');
-
     if (dayTasks.length > 0) {
       setSelectedDateForList(cell.dateString);
     } else {
       setSelectedDateForNew(cell.dateString);
+      setEditingTask(null);
       setIsNewModalOpen(true);
     }
   };
@@ -272,8 +262,8 @@ export const CalendarView = () => {
                 borderColor: cell.isToday ? 'var(--orange-primary)' : 'var(--border-color)',
                 background: cell.isToday ? 'var(--orange-light)' : '#ffffff',
                 boxShadow: cell.isToday ? '0 0 15px rgba(255, 122, 0, 0.15)' : 'none',
-                opacity: cell.isPast && !dayTasks.length ? 0.6 : 1,
-                cursor: cell.isPast && !dayTasks.length ? 'not-allowed' : 'pointer'
+                opacity: 1,
+                cursor: 'pointer'
               }}
             >
               <div>
@@ -309,7 +299,7 @@ export const CalendarView = () => {
                 </div>
               </div>
 
-              {!cell.isPast && dayTasks.length === 0 && (
+              {dayTasks.length === 0 && (
                 <div
                   style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center', padding: '12px 0', opacity: 0.5 }}
                 >
@@ -342,14 +332,24 @@ export const CalendarView = () => {
         <ContentDetailView
           task={selectedTaskForDetails}
           onClose={() => setSelectedTaskForDetails(null)}
+          onEdit={(taskToEdit) => {
+            setSelectedTaskForDetails(null);
+            setEditingTask(taskToEdit);
+            setSelectedDateForNew(taskToEdit.scheduledDate);
+            setIsNewModalOpen(true);
+          }}
         />
       )}
 
       {/* New Schedule Modal */}
       <ContentModal
         isOpen={isNewModalOpen}
-        onClose={() => setIsNewModalOpen(false)}
+        onClose={() => {
+          setIsNewModalOpen(false);
+          setEditingTask(null);
+        }}
         initialDate={selectedDateForNew}
+        editingTask={editingTask}
       />
 
     </div>
