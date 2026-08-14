@@ -18,6 +18,7 @@ export const CalendarGrid = ({ onOpenAddModal }) => {
   const [selectedTaskForDetails, setSelectedTaskForDetails] = useState(null);
   const [isNewPostModalOpen, setIsNewPostModalOpen] = useState(false);
   const [selectedDateForNew, setSelectedDateForNew] = useState('');
+  const [editingTask, setEditingTask] = useState(null);
 
   const todayDate = new Date();
   const todayStr = todayDate.toISOString().split('T')[0];
@@ -81,22 +82,11 @@ export const CalendarGrid = ({ onOpenAddModal }) => {
     
     const dayTasks = tasks.filter(t => t.scheduledDate === cell.dateString);
 
-    if (cell.isPast) {
-      if (dayTasks.length > 0) {
-        setSelectedDateForList(cell.dateString);
-      } else {
-        setPastDateWarning(`Cannot schedule content on past date (${cell.dateString}). Please select today or a future date.`);
-        setTimeout(() => setPastDateWarning(''), 4000);
-      }
-      return;
-    }
-
-    setPastDateWarning('');
-
     if (dayTasks.length > 0) {
       setSelectedDateForList(cell.dateString);
     } else {
       setSelectedDateForNew(cell.dateString);
+      setEditingTask(null);
       setIsNewPostModalOpen(true);
     }
   };
@@ -232,8 +222,8 @@ export const CalendarGrid = ({ onOpenAddModal }) => {
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
-                opacity: cell.isPast && !dayTasks.length ? 0.6 : 1,
-                cursor: cell.isPast && !dayTasks.length ? 'not-allowed' : 'pointer',
+                opacity: 1,
+                cursor: 'pointer',
                 boxShadow: cell.isToday ? '0 4px 12px rgba(255, 122, 0, 0.2)' : 'none',
                 transition: 'all 0.15s ease'
               }}
@@ -316,14 +306,24 @@ export const CalendarGrid = ({ onOpenAddModal }) => {
         <ContentDetailView 
           task={selectedTaskForDetails}
           onClose={() => setSelectedTaskForDetails(null)}
+          onEdit={(taskToEdit) => {
+            setSelectedTaskForDetails(null);
+            setEditingTask(taskToEdit);
+            setSelectedDateForNew(taskToEdit.scheduledDate);
+            setIsNewPostModalOpen(true);
+          }}
         />
       )}
 
       {/* New Schedule Modal */}
       <ContentModal 
         isOpen={isNewPostModalOpen}
-        onClose={() => setIsNewPostModalOpen(false)}
+        onClose={() => {
+          setIsNewPostModalOpen(false);
+          setEditingTask(null);
+        }}
         initialDate={selectedDateForNew}
+        editingTask={editingTask}
       />
 
     </div>
